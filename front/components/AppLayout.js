@@ -3,6 +3,7 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Menu, Input, Button, Row, Col, Card, Avatar } from 'antd';
 import LoginForm from './LoginForm';
+import UserProfile from './UserProfile';
 
 const dummy = {
   nickname: '제로초',
@@ -23,21 +24,10 @@ const AppLayout = ({ children }) => {
         </Menu.Item>
       </Menu>
       <Link href="/signup"><a><Button>회원가입</Button></a></Link>
-      <Row>
+      <Row gutter={10}>   {/* gutter={10} : xs, sm 등으로 N등분한 화면의 간격을 넓혀주는 역할  */}
         <Col xs={24} md={6}>
           {dummy.isLoggedIn
-            ? <Card     
-              actions={[
-                <div key="twit">게시글<br />{dummy.Post.length}</div>,
-                <div key="following">팔로잉<br />{dummy.followings.length}</div>,
-                <div key="follower">팔로워<br />{dummy.followers.length}</div>,
-              ]}
-            >
-              <Card.Meta
-                avatar={<Avatar>{dummy.nickname[0]}</Avatar>}
-                title={dummy.nickname}
-              />
-            </Card>
+            ? <UserProfile />
             :
             <LoginForm />
           }
@@ -54,7 +44,7 @@ const AppLayout = ({ children }) => {
   );
 };
 
-AppLayout.proptypes = {
+AppLayout.propTypes = {
   children: PropTypes.elementType,
 };
 
