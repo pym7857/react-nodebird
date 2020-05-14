@@ -1,5 +1,6 @@
 # react-nodebird
 ###
 ```
-버전
+front: React
+back: 
 ```
