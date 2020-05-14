@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, Checkbox, Button } from 'antd';
+import { signUpAction } from '../reducers/user';
+import { useDispatch } from 'react-redux';
 
 // 중복되는 로직의 이벤트 처리 -> 커스텀 훅
 // export해놓으면 다른곳에서 모듈처럼 사용가능 !
@@ -21,6 +23,8 @@ const Signup = () => {
     const [nick, onChangeNick] = useInput('');
     const [password, onChangePassword] = useInput('');
 
+    const dispatch = useDispatch();
+
     const onSubmit = useCallback((e) =>{
         e.preventDefault();
         if (password !== passwordCheck) {
@@ -29,6 +33,12 @@ const Signup = () => {
         if (!term) {
             return setTermError(true);
         }
+        // reducers/user.js의 signUpAction에 data매개변수 넣어주기
+        dispatch(signUpAction({
+            id,
+            password,
+            nick,
+        }));
     }, [password, passwordCheck, term]);
 
     const onChangePasswordCheck = useCallback((e) => {

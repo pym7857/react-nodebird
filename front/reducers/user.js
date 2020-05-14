@@ -1,21 +1,35 @@
 /* redux state */
+const dummyUser = {
+    nickname: '제로초',
+    Post: [],
+    followings: [],
+    followers: [],
+    signUpData: {},
+};
+
 export const initialState = {
     isLoggedIn: false,
     user: null,
 };
 
 /* Action의 이름 */
+export const SIGN_UP = 'SIGN_UP';
 export const LOG_IN = 'LOG_IN';
 export const LOG_OUT = 'LOG_OUT';
+export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
+export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
 /* 실제 Action */
-const loginAction = {
-    type: LOG_IN,
-    data: {
-        nickname: '제로초',
-    }
+export const signUpAction = (data)  => {
+    return {
+        type: SIGN_UP,
+        data: data,
+    };
 };
-const logoutAction = {
+export const loginAction = {
+    type: LOG_IN,
+};
+export const logoutAction = {
     type: LOG_OUT,
 };
 
@@ -26,7 +40,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isLoggedIn: true,
-                user: action.data,
+                user: dummyUser,
             }
         }
         case LOG_OUT: {
@@ -35,6 +49,12 @@ const reducer = (state = initialState, action) => {
                 isLoggedIn: false,
                 user: null,
             }
+        }
+        case SIGN_UP: {
+            return {
+                ...state,
+                signUpData: action.data,
+            };
         }
         default: {
             return {

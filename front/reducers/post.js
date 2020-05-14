@@ -8,7 +8,7 @@ export const initialState = {
         content: '첫 번째 게시글',
         img: 'https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726',
       }],
-    imagePaths: [],
+    imagePaths: [], // 미리보기 이미지 경로 
 };
 
 /* Action의 이름 */
@@ -16,10 +16,10 @@ export const ADD_POST = 'ADD_POST';
 export const ADD_DUMMY = 'ADD_DUMMY';
 
 /* 실제 Action */
-const addPost = {
+export const addPost = {
     type: ADD_POST,
 }
-const addDummy = {
+export const addDummy = {
     type: ADD_DUMMY,
     data: {
         content: 'hello',
