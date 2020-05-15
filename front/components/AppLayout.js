@@ -2,9 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Menu, Input, Button, Row, Col, Card, Avatar } from 'antd';
+import { useSelector } from 'react-redux';
+
 import LoginForm from './LoginForm';
 import UserProfile from './UserProfile';
-import { useSelector } from 'react-redux';
 
 const AppLayout = ({ children }) => {
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, List, Card } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
+
 import NicknameEditForm from '../components/NicknameEditForm';
 
 const Profile = () => {

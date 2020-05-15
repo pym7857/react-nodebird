@@ -2,13 +2,14 @@ import React from 'react';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 import withRedux from 'next-redux-wrapper';
-import AppLayout from '../components/AppLayout';
 import { createStore, compose, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import createSagaMiddleware from 'redux-saga';
+
+import AppLayout from '../components/AppLayout';
+import rootSaga from '../sagas';
 import reducer from '../reducers';  // ../reducers/index.js와 동일 (index.js는 생략 가능)
                                     // rootReducer인데 reducer이름으로 가져옴 (가져오는 이름은 이처럼 맘대로 가능)
-import createSagaMiddleware from 'redux-saga';
-import rootSaga from '../sagas';
 
 const NodeBird = ({ Component, store }) => {
     return (
@@ -25,8 +26,8 @@ const NodeBird = ({ Component, store }) => {
 };
 
 NodeBird.propTypes = {
-    Component: PropTypes.elementType, // node: jsx에 들어갈 수 있는 모든 것(all)을 지칭 (=렌더링 될 수 있는 애들)
-    store: PropTypes.object,
+    Component: PropTypes.elementType.isRequired, // isRequired 넣으면 실수로 props안넣었을 때 경고를 해줌
+    store: PropTypes.object.isRequired,
 };
 
 /* 위 const NodeBird에 store를 인자로 넣어주는 부분 -> 이 부분은 그냥 암기 ! */

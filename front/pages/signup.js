@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, Checkbox, Button } from 'antd';
-import { signUpAction } from '../reducers/user';
 import { useDispatch } from 'react-redux';
+
+import { signUpAction } from '../reducers/user';
 
 // 중복되는 로직의 이벤트 처리 -> 커스텀 훅
 // export해놓으면 다른곳에서 모듈처럼 사용가능 !

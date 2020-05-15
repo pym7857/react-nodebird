@@ -1,10 +1,19 @@
-import { all, fork, takeLatest, call, put } from 'redux-saga';
-import { LOG_IN, LOG_IN_SUCCESS, LOG_IN_FAILURE } from '../reducers/user';
+import { all, fork, takeLatest, takeEvery, call, put, take, delay } from 'redux-saga';
+import axios from 'axios';
+import { 
+    LOG_IN_REQUEST, 
+    LOG_IN_SUCCESS, 
+    LOG_IN_FAILURE, 
+    SIGN_UP_REQUEST,
+    SIGN_UP_SUCCESS,
+    SIGN_UP_FAILURE,
+} from '../reducers/user';
 
-function loginAPI() {   // 서버에 요청을 보내는 부분 
-
+/* 로그인 */
+function loginAPI() {   
+    // 서버에 요청을 보내는 부분 
+    return axios.post('/login');
 }
-
 function* login() {
     try {
         yield call(loginAPI); // 서버에 요청
@@ -19,15 +28,38 @@ function* login() {
         })
     }
 }
-
 function* watchLogin() {
-    yield takeLatest(LOG_IN, login) // takeLatest가 LOG_IN 액션이 dispatch되길 기다려서 dispatch될 때, login 제너레이터를 호출합니다.
+    yield takeEvery(LOG_IN_REQUEST, login);
 }
+
+
+/* 회원가입 */
+function signUpAPI() {
+    // 서버에 요청을 보내는 부분 
+    return axios.post('/login');
+}
+function* signUp() {
+    try {
+        yield call(signUpAPI);
+        yield put({
+            type: SIGN_UP_SUCCESS,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: SIGN_UP_FAILURE,
+        });
+    }
+}
+function* watchSignUp() {
+    yield takeEvery(SIGN_UP_REQUEST, signUp);
+}
+
 
 function* userSaga() {
     yield all([
         fork(watchLogin),
+        fork(watchSignUp),
     ]);
 }
-
 export default userSaga;
