@@ -2,6 +2,6 @@
 
 ### 실행
 ```
-> cd front
+> cd back
 > npm run dev
 ```
