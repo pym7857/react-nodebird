@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Form, Input, Checkbox, Button } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Router from 'next/router';
 
-import { signUpAction } from '../reducers/user';
+import { SIGN_UP_REQUEST } from '../reducers/user';
 
 // 중복되는 로직의 이벤트 처리 -> 커스텀 훅
 // export해놓으면 다른곳에서 모듈처럼 사용가능 !
@@ -19,12 +20,22 @@ const Signup = () => {
     const [term, setTerm] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [termError, setTermError] = useState(false);
+    
 
     const [id, onChangeId] = useInput('');
     const [nick, onChangeNick] = useInput('');
     const [password, onChangePassword] = useInput('');
 
     const dispatch = useDispatch();
+    const { isSigningUp, me } = useSelector(state => state.user);
+
+    // 회원가입 창에서 로그인 해버리는 경우, 메인페이지로 redirect
+    useEffect(() => {
+        if (me) {
+            alert('로그인 되었습니다. 메인페이지로 이동합니다.')
+            Router.push('/');
+        }
+    }, [me && me.id]);
 
     const onSubmit = useCallback((e) =>{
         e.preventDefault();
@@ -34,13 +45,15 @@ const Signup = () => {
         if (!term) {
             return setTermError(true);
         }
-        // reducers/user.js의 signUpAction에 data매개변수 넣어주기
-        dispatch(signUpAction({
-            id,
-            password,
-            nick,
-        }));
-    }, [password, passwordCheck, term]);
+        return dispatch({   // front/sagas/user.js의 sighUp함수의 매개변수인 aciton에 data객체가 담긴다.
+            type: SIGN_UP_REQUEST,
+            data: {
+                userId: id,
+                password,
+                nickname: nick,
+            },
+        });
+    }, [id, nick, password, passwordCheck, term]);
 
     const onChangePasswordCheck = useCallback((e) => {
         setPasswordError(e.target.value !== password); // 비밀번호 확인 칠때마다, 비밀번호와 같은지 확인
@@ -83,7 +96,7 @@ const Signup = () => {
                     {termError && <div style={{ color: 'red' }}>약관에 동의하셔야 합니다.</div>}
                 </div>
                 <div style={{ maringTop: 10 }}>
-                    <Button type="primary" htmlType="submit">가입하기</Button>
+                    <Button type="primary" htmlType="submit" loading={isSigningUp}>가입하기</Button>
                 </div>
             </Form>
         </>

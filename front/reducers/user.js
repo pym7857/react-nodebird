@@ -4,7 +4,7 @@ const dummyUser = {
     Post: [],
     followings: [],
     followers: [],
-    signUpData: {},
+    id: 1,
 };
 
 export const initialState = {
@@ -61,34 +61,7 @@ export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';                     // 중요 ->
 
 
 /* 실제 Action */
-export const signUpAction = (data)  => {
-    return {
-        type: SIGN_UP_REQUEST,
-        data,
-    };
-};
-export const signUpSuccess = {
-    type: SIGN_UP_SUCCESS,
-};
-export const loginAction = (data) => {
-    return {
-        type: LOG_IN_REQUEST,
-        data,
-    };
-};
-export const logoutAction = {
-    type: LOG_OUT_REQUEST,
-};
-/* export const signUp = (data) => {
-    return {
-        type: SIGN_UP_REQUEST,
-        data,
-    };
-} */
-export const signUp = data => ({   // 바로 return하는 형식 
-    type: SIGN_UP_REQUEST,
-    data,
-});
+// ...
 
 /* Reducer */
 const reducer = (state = initialState, action) => {
@@ -96,13 +69,15 @@ const reducer = (state = initialState, action) => {
         case LOG_IN_REQUEST: {
             return {
                 ...state,
-                loginData: action.data,
-                isLoading: true,
+                isLoggingIn: true,
+                isLoggedIn: false,
+                logInErrorReason: '',
             };
         }
         case LOG_IN_SUCCESS: {
             return {
                 ...state,
+                isLoggingIn: false,
                 isLoggedIn: true,
                 me: dummyUser,
                 isLoading: false,
@@ -111,7 +86,9 @@ const reducer = (state = initialState, action) => {
         case LOG_IN_FAILURE: {
             return {
                 ...state,
+                isLoggingIn: false,
                 isLoggedIn: false,
+                logInErrorReason: action.error,
                 me: null,
             };
         }
@@ -125,17 +102,21 @@ const reducer = (state = initialState, action) => {
         case SIGN_UP_REQUEST: {
             return {
                 ...state,
-                signUpData: action.data,
+                isSigningUp: true,
+                isSignedUp: false,
+                signUpErrorReason: '',
             };
         }
         case SIGN_UP_SUCCESS: {
             return {
-
+                isSigningUp: false,
+                isSignedUp: true,
             };
         }
         case SIGN_UP_FAILURE: {
             return {
-                
+                isSigningUp: false,
+                signUpErrorReason: action.error,
             };
         }
         default: {

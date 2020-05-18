@@ -1,18 +1,43 @@
 /* redux state */
 export const initialState = {
-    mainPosts: [{   // 화면에 보일 main포스트들 
+    mainPosts: [{               // 화면에 보일 main포스트들 
+        id: 1,
         User: {
           id: 1,
           nickname: '제로초',
         },
         content: '첫 번째 게시글',
         img: 'https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726',
-      }],
-    imagePaths: [], // 미리보기 이미지 경로 
-    
-    addPostErrorReason: false,  // 포스트 업로드 실패 사유 
+        Comments: [],
+    }],
+    imagePaths: [],             // 미리보기 이미지 경로 
+    addPostErrorReason: '',     // 포스트 업로드 실패 사유 
     isAddingPost: false,        // 포스트 업로드 중 
+    postAdded: false,           // 포스트 업로드 성공 여부 (쓰는 이유: 글 작성후, 이게 true가 되면 TextArea 비워주기 위해서)
+    isAddingComment: false,     // 댓글 업로드 중 
+    addCommentErrorReason: '',  // 댓글 업로드 에러 사유 
+    commentAdded: false,        // 댓글이 추가되었는지 (쓰는 이유: 댓글 작성후, 이게 true가 되면 TextArea 비워주기 위해서)
 };
+
+const dummyPost = {
+    id: 2,
+    User: {
+        id: 1,
+        nickname: '제로초',
+    },
+    content: '나는 더미 입니다.',
+    Comments: [],
+}
+
+const dummyComment= {
+    id: 1,
+    User: {
+        id: 1,
+        nickname: 2,
+    },
+    createdAt: new Date(),
+    content: '더미 댓글입니다.',
+}
 
 /* Action의 이름 */
 export const LOAD_MAIN_POSTS_REQUEST = 'LOAD_MAIN_POSTS_REQUEST';       // 메인 포스트 로딩 액션
@@ -31,7 +56,7 @@ export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';           // 이�
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
 export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
 
-export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';                     // 포스트 업로드 액션
+export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';                     // 게시글 업로드 액션
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
 
@@ -42,7 +67,8 @@ export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE';
 export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';               // 게시글 좋아요 취소 
 export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
 export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
-export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';               // 게시글 댓글 남기기 
+
+export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
@@ -61,19 +87,7 @@ export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
 /* 실제 Action */
-export const addPost = {
-    type: ADD_POST,
-}
-export const addDummy = {
-    type: ADD_DUMMY,
-    data: {
-        content: 'hello',
-        UserId: 1,
-        User: {
-            nickname:'제로초',
-        },
-    },
-};
+// ...
 
 /* Reducer */
 const reducer = (state = initialState, action) => {
@@ -90,7 +104,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAddingPost: false,
-                mainPosts: [dummyPost, ...state.mainPosts],
+                mainPosts: [dummyPost, ...state.mainPosts], // dummyPost가 기존에 있던 포스트들 앞에 들어가게 된다.
                 postAdded: true,
             };
         }
@@ -110,14 +124,28 @@ const reducer = (state = initialState, action) => {
             };
         }
         case ADD_COMMENT_SUCCESS: {
+            // 먼저, 여러개의 게시글 중에 해당 게시글의 index를 도출한 후,
+            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
+            // 해당 게시글을 찾는다
+            const post = state.mainPosts[postIndex];
+            // 불변성을 확보하면서, 뒤에다가 새 댓글 달아준다 
+            const Comments = [...post.Comments, dummyComment];
+            // mainPosts도 불변성을 확보해 줘야한다.
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = { ...post, Comments };
 
             return {
-
+                ...state,
+                isAddingComment: false,
+                mainPosts, // 여러 게시글 중에 해당하는 게시글에 해당 댓글 달아주기 (불변성 때문에 복잡한 작업)
+                commentAdded: true,
             };
         }
         case ADD_COMMENT_FAILURE: {
             return {
-                
+                ...state,
+                isAddingComment: false,
+                addCommentErrorReason: action.error,
             };
         }
         default: {
