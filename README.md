@@ -1,6 +1,6 @@
 # react-nodebird
 ###
 ```
-front: React
-back: 
+front: React, Next
+back: express
 ```
