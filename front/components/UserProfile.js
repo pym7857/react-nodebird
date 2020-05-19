@@ -6,6 +6,7 @@ import { LOG_OUT_REQUEST } from '../reducers/user';
 
 const UserProfile = () => {
     const { me } = useSelector(state => state.user);
+    //console.log(me);
     const dispatch = useDispatch();
 
     const onLogout = useCallback(() => {    // useCallback으로 감싸는 이유는 자식컴포넌트에 props로 전달하기 때문
@@ -17,9 +18,9 @@ const UserProfile = () => {
     return (
         <Card     
             actions={[
-            <div key="twit">게시글<br />{me.Post.length}</div>,
-            <div key="following">팔로잉<br />{me.followings.length}</div>,
-            <div key="follower">팔로워<br />{me.followers.length}</div>,
+                <div key="twit">게시글<br />{}</div>,            
+                <div key="following">팔로잉<br />{}</div>,
+                <div key="follower">팔로워<br />{}</div>,
             ]}
         >
             <Card.Meta

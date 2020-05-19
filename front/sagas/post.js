@@ -1,14 +1,19 @@
 import { all, takeLatest, delay, put, fork, actionChannel } from 'redux-saga/effects';
 import { 
+    ADD_POST_FAILURE, 
     ADD_POST_REQUEST, 
-    ADD_POST_SUCCESS, 
-    ADD_POST_FAILURE,
+    ADD_POST_SUCCESS,
+    ADD_COMMENT_FAILURE,
     ADD_COMMENT_REQUEST,
-    ADD_COMMENT_SUCCESS,
-    ADD_COMMENT_FAILURE
+    ADD_COMMENT_SUCCESS, 
+    LOAD_MAIN_POSTS_FAILURE, 
+    LOAD_MAIN_POSTS_REQUEST,
+    LOAD_MAIN_POSTS_SUCCESS,
 } from '../reducers/post';
 
-/* ㅡㅡㅡㅡㅡ 게시글 업로드 3종세트 ㅡㅡㅡㅡㅡ*/
+/**
+ * 게시글 업로드 3종세트
+ */
 function addPostAPI() {
     return // 서버에 요청을 보내는 부분 
 }
@@ -30,7 +35,9 @@ function* watchAddPost() {
     yield takeLatest(ADD_POST_REQUEST, addPost);
 }
 
-/* ㅡㅡㅡㅡㅡ 댓글 업로드 3종세트 ㅡㅡㅡㅡㅡ*/
+/**
+ * 댓글 업로드 3종세트
+ */
 function addCommentAPI() {
     return // 서버에 요청을 보내는 부분 
 }

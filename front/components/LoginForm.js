@@ -14,10 +14,11 @@ const LoginForm = () => {
 
     const onSubmitForm = useCallback((e) => { // props로 들어가는 함수는 무조건 useCallback
         e.preventDefault();
-        dispatch({
+        return dispatch({
           type: LOG_IN_REQUEST,
           data: {
-            id, password,
+            userId: id, 
+            password,
           },
         });
     }, [id, password]);
