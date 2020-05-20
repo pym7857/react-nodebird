@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Card, Icon, Button, Avatar, Form, Input, List, Comment } from 'antd';
+import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { ADD_COMMENT_REQUEST } from '../reducers/post';
@@ -53,7 +54,18 @@ const PostCard = ({ post }) => {
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
           title={post.User.nickname}
-          description={post.content}
+          description={(
+            <div>
+              {post.content.split(/(#[^\s]+)/g).map((v) => {
+                if (v.match(/#[^\s]+/g)) {  // 쪼개진 애가 해시태그면 링크로 바꿔주기
+                  return (
+                    <Link href="/hashtag" key={v}><a>{v}</a></Link>
+                  );
+                }
+                return v; // 해시태그(#)가 아니라면, 그냥 문자열만 리턴 
+              })}
+            </div>
+          )}
         />
       </Card>
       {commentFormOpened && (

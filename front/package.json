@@ -4,16 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
+    "dev": "nodemon",
     "build": "next build",
     "start": "next start"
   },
-  "author": "ZeroCho",
+  "author": "ympark",
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^4.1.0",
     "antd": "^3.17.0",
     "axios": "^0.18.0",
+    "cookie-parser": "^1.4.4",
+    "dotenv": "^8.0.0",
+    "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "morgan": "^1.9.1",
     "next": "^8.1.0",
     "next-redux-wrapper": "^3.0.0-alpha.2",
     "prop-types": "^15.7.2",
@@ -24,6 +29,7 @@
     "redux-saga": "^1.0.2"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.17.2",

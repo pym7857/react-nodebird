@@ -31,7 +31,7 @@ const AppLayout = ({ children }) => {
           <Input.Search enterButton style={{ verticalAlign: 'middle' }}/>
         </Menu.Item>
       </Menu>
-      <Link href="/signup"><a><Button>회원가입</Button></a></Link>
+      {!me && <Link href="/signup"><a><Button>회원가입</Button></a></Link>}
       <Row gutter={10}>   {/* gutter={10} : xs, sm 등으로 N등분한 화면의 간격을 넓혀주는 역할  */}
         <Col xs={24} md={6}>
           {me

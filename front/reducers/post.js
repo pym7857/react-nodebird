@@ -1,15 +1,6 @@
 /* redux state */
 export const initialState = {
-    mainPosts: [{               // 화면에 보일 main포스트들 
-        id: 1,
-        User: {
-          id: 1,
-          nickname: '제로초',
-        },
-        content: '첫 번째 게시글',
-        img: 'https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726',
-        Comments: [],
-    }],
+    mainPosts: [],
     imagePaths: [],             // 미리보기 이미지 경로 
     addPostErrorReason: '',     // 포스트 업로드 실패 사유 
     isAddingPost: false,        // 포스트 업로드 중 
@@ -18,26 +9,6 @@ export const initialState = {
     addCommentErrorReason: '',  // 댓글 업로드 에러 사유 
     commentAdded: false,        // 댓글이 추가되었는지 (쓰는 이유: 댓글 작성후, 이게 true가 되면 TextArea 비워주기 위해서)
 };
-
-const dummyPost = {
-    id: 2,
-    User: {
-        id: 1,
-        nickname: '제로초',
-    },
-    content: '나는 더미 입니다.',
-    Comments: [],
-}
-
-const dummyComment= {
-    id: 1,
-    User: {
-        id: 1,
-        nickname: 2,
-    },
-    createdAt: new Date(),
-    content: '더미 댓글입니다.',
-}
 
 /* Action의 이름 */
 export const LOAD_MAIN_POSTS_REQUEST = 'LOAD_MAIN_POSTS_REQUEST';       // 메인 포스트 로딩 액션
@@ -92,6 +63,23 @@ export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 /* Reducer */
 const reducer = (state = initialState, action) => {
     switch (action.type) {
+        case LOAD_MAIN_POSTS_REQUEST: {
+            return {
+              ...state,
+              mainPosts: [],
+            };
+        }
+        case LOAD_MAIN_POSTS_SUCCESS: {
+            return {
+              ...state,
+              mainPosts: action.data,
+            };
+        }
+        case LOAD_MAIN_POSTS_FAILURE: {
+            return {
+              ...state,
+            };
+        }
         case ADD_POST_REQUEST: {
             return {
                 ...state,
@@ -104,7 +92,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAddingPost: false,
-                mainPosts: [dummyPost, ...state.mainPosts], // dummyPost가 기존에 있던 포스트들 앞에 들어가게 된다.
+                mainPosts: [action.data, ...state.mainPosts], // dummyPost가 기존에 있던 포스트들 앞에 들어가게 된다.
                 postAdded: true,
             };
         }
@@ -129,7 +117,7 @@ const reducer = (state = initialState, action) => {
             // 해당 게시글을 찾는다
             const post = state.mainPosts[postIndex];
             // 불변성을 확보하면서, 뒤에다가 새 댓글 달아준다 
-            const Comments = [...post.Comments, dummyComment];
+            const Comments = [...post.Comments, action.data.comment];
             // mainPosts도 불변성을 확보해 줘야한다.
             const mainPosts = [...state.mainPosts];
             mainPosts[postIndex] = { ...post, Comments };

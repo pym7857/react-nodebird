@@ -5,6 +5,7 @@ const db = require('../models');
 
 const router = express.Router();
 
+/* 페이지 새로 불러올때마다, 유저 정보(req.user) 받아오기 */
 router.get('/', (req, res) => {
     if (!req.user) {  // deserializaUser가 req.user 생성 
       return res.status(401).send('로그인이 필요합니다.'); // 401에러는 로그인하면 없어짐 
@@ -44,12 +45,14 @@ router.get('/:id', (req, res) => {
 
 });
 
+/* 로그아웃 */
 router.post('/logout', (req, res) => {
     req.logout();
     req.session.destroy();
     res.send('로그아웃 성공');
 });
 
+/* 로그인 */
 router.post('/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) { // 서버 에러가 나면 

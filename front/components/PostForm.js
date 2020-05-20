@@ -15,13 +15,16 @@ const PostForm = () => {
 
     const onSubmitForm = useCallback((e) => { // props로 들어가는 함수는 무조건 useCallback
       e.preventDefault();
+      if (!text || !text.trim()) {    // trim(): 스페이스바만 치는 사람들 있기때문에 넣어준다.
+        return alert('내용을 입력해주세요!');
+      }
       dispatch({
           type: ADD_POST_REQUEST,
           data: {
-            text,
+            content: text,
           },
         });
-    }, []);
+    }, [text]); // useCallback에서 사용된 state는 여기에 무조건 넣어줘야한다.
 
     const onChangeText = useCallback((e) => { // props로 들어가는 함수는 무조건 useCallback
       setText(e.target.value);

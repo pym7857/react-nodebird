@@ -5,8 +5,8 @@ const db = require('../models');
 
 module.exports = () => {
     passport.use(new LocalStrategy({
-        usernameField: 'userId',    // 프론트에서 보낸 정보가 req.body.userId에 담겨 들어온다
-        passwordField: 'password',  // 프론트에서 보낸 정보가 req.body.password 담겨 들어온다
+        usernameField: 'userId',    // 프론트에서 보낸 정보가 req.body.userId에 담겨 들어온다 (이유 : back/index.js 참조)
+        passwordField: 'password',  // 프론트에서 보낸 정보가 req.body.password 담겨 들어온다 (이유 : back/index.js 참조)
     }, async (userId, password, done) => {
         try {
             const exUser = await db.User.findOne({ where: { userId } });
