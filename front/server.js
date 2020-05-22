@@ -30,6 +30,18 @@ app.prepare().then(() => {
         },
     }));
 
+    /* 해당 태그의 게시물들 가져오기 */
+    server.get('/hashtag/:tag', (req, res) => {
+        return app.render(req, res, '/hashtag', { tag: req.params.tag });    // pages/hashtag.js 를 렌더링 (동적 주소 처리 가능)
+                                                                             // {}를 같이 전달해줘야 프론트에서 동적인 tag를 캐치 가능
+    });
+
+    /* 해당 id의 유저의 정보(=남의 정보)&게시글 가져오기 */
+    server.get('/user/:id', (req, res) => {
+        return app.render(req, res, '/user', { id: req.params.id });    // pages/user.js 를 렌더링 (동적 주소 처리 가능)
+                                                                        // {}를 같이 전달해줘야 프론트에서 동적인 id를 캐치 가능
+    });
+
     server.get('*', (req, res) => {     // *은 모든 get요청을 여기서 처리하겠다는 뜻 
         return handle(req, res);
     });

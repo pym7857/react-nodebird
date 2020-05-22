@@ -127,10 +127,18 @@ const reducer = (state = initialState, action) => {
             };
         }
         case LOAD_USER_SUCCESS: {
-            return {
-              ...state,
-              me: action.data,
-            };
+            if (action.isThisMe) {    // (sagas/user.js)의 function*loadUser() 에서 put으로 넘겨준것이 바로, action.me
+                return {
+                    ...state,
+                    me: action.data,
+                  };
+            } else {
+                return {
+                    ...state,
+                    userInfo: action.data,
+                  };
+            }
+            
         }
         case LOAD_USER_FAILURE: {
             return {

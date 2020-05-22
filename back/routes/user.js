@@ -8,7 +8,7 @@ const router = express.Router();
 /* 페이지 새로 불러올때마다, 유저 정보(req.user) 받아오기 */
 router.get('/', (req, res) => {
     if (!req.user) {  // deserializaUser가 req.user 생성 
-      return res.status(401).send('로그인이 필요합니다.'); // 401에러는 로그인하면 없어짐 
+      return res.status(401).send('유저 정보를 받아오기 위해서는, 로그인이 필요합니다.'); // 401에러는 로그인하면 없어짐 
     }
     const user = Object.assign({}, req.user.toJSON()); // 객체 복사해서 (toJSON() 안붙이면 에러),
     delete user.password;                               // 비밀번호 지우고 정보 보내기 
@@ -25,7 +25,7 @@ router.post('/', async (req, res, next) => {
             },
         });
         if (exUser) {
-            return res.status(403).send('이미 사용중인 아이디입니다.');
+            return res.status(403).send('실패 : 이미 사용중인 아이디입니다.');
         }
         const hashedPassword = await bcrypt.hash(req.body.password, 12); // 비밀번호 암호화(salt는 10~13)
         const newUser = await db.User.create({
@@ -41,8 +41,39 @@ router.post('/', async (req, res, next) => {
 });
 
 /* 다른 유저의 정보 가져오기 */
-router.get('/:id', (req, res) => {
-
+router.get('/:id', async (req, res, next) => {
+  try {
+    const user = await db.User.findOne({
+      where: { id: parseInt(req.params.id, 10) },
+      include: [
+        {
+          model: db.Post,
+          as: 'Posts',
+          attributes: ['id'],   // 남의 게시글
+        }, 
+        {
+          model: db.User,
+          as: 'Followings',
+          attributes: ['id'],   // 남의 팔로윙
+        },
+        {
+          model: db.User,
+          as: 'Followers',
+          attributes: ['id'],   // 남의 팔로워
+        }],
+      attributes: ['id', 'nickname'],
+    });
+    // 남의 팔로윙 아이디와 팔로워 아이디가 보이면 사생활 침해될 수 있음
+    // 보안코드 작성 -> 몇개 인지 개수만 알려주기 
+    const jsonUser = user.toJSON();
+    jsonUser.Posts = jsonUser.Posts ? jsonUser.Posts.length : 0;
+    jsonUser.Followings = jsonUser.Followings ? jsonUser.Followings.length : 0;
+    jsonUser.Followers = jsonUser.Followers ? jsonUser.Followers.length : 0;
+    res.json(jsonUser);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
 /* 로그아웃 */
@@ -110,8 +141,24 @@ router.delete('/:id/follower', (req, res) => {
 
 });
 
-router.get('/:id/posts', (req, res) => {
-
+/* 특정id의user의 게시글들 가져오기 */
+router.get('/:id/posts', async (req, res, next) => {
+    try {
+      const posts = await db.Post.findAll({
+        where: {
+          UserId: parseInt(req.params.id, 10),  // post테이블의 UserId필드
+          RetweetId: null,
+        },
+        include: [{
+          model: db.User,
+          attributes: ['id', 'nickname'], // 사용자 정보 가져오기 
+        }]
+      });
+      res.json(posts);
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
 });
 
 module.exports = router;

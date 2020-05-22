@@ -11,6 +11,7 @@ const db = require('./models'); // index.js경로는 생략가능
 const userAPIRouter = require('./routes/user');
 const postAPIRouter = require('./routes/post');     // 게시글 한개 대상
 const postsAPIRouter = require('./routes/posts');   // 게시글 여러개 대상
+const hashtagAPIRouter = require('./routes/hashtag');
 
 dotenv.config();    // dotenv 실행 
 const app = express();
@@ -41,6 +42,7 @@ app.use(passport.session()); // 반드시 express session밑에 적어줘야 한
 app.use('/api/user', userAPIRouter);
 app.use('/api/post', postAPIRouter);
 app.use('/api/posts', postsAPIRouter);
+app.use('/api/hashtag', hashtagAPIRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello!');

@@ -11,7 +11,7 @@ import rootSaga from '../sagas';
 import reducer from '../reducers';  // ../reducers/index.js와 동일 (index.js는 생략 가능)
                                     // rootReducer인데 reducer이름으로 가져옴 (가져오는 이름은 이처럼 맘대로 가능)
 
-const NodeBird = ({ Component, store }) => {
+const NodeBird = ({ Component, store, pageProps }) => {
     return (
         <Provider store={store}>
             <Head>
@@ -19,7 +19,7 @@ const NodeBird = ({ Component, store }) => {
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css" />
             </Head>
             <AppLayout>
-                <Component />
+                <Component {...pageProps}/>
             </AppLayout>
         </Provider>
     );
@@ -28,6 +28,17 @@ const NodeBird = ({ Component, store }) => {
 NodeBird.propTypes = {
     Component: PropTypes.elementType.isRequired, // isRequired 넣으면 실수로 props안넣었을 때 경고를 해줌
     store: PropTypes.object.isRequired,
+    pageProps: PropTypes.object.isRequired,
+};
+
+NodeBird.getInitialProps = async (context) => {
+    //console.log(context);
+    const { ctx } = context;
+    let pageProps = {};
+    if (context.Component.getInitialProps) {
+        pageProps = await context.Component.getInitialProps(ctx);
+    } 
+    return { pageProps };
 };
 
 /* 위 const NodeBird에 store를 인자로 넣어주는 부분 -> 이 부분은 그냥 암기 ! */

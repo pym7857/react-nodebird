@@ -95,21 +95,26 @@ function* watchLogOut() {
 }
   
 /**
- * 유저 정보 가져오기 3종세트
+ * 해당 유저 정보 가져오기 3종세트
  */
-function loadUserAPI() {
+function loadUserAPI(userId) {
     // 서버에 요청을 보내는 부분
-    return axios.get('/user/', {    
+    return axios.get(userId ? `/user/${userId}` : '/user/', {   // userId가 있으면 남의정보 가져오고
+                                                                // 없으면 내정보 가져오기    
       withCredentials: true,    // 쿠키로 정보가져오기 
     });
 }
-function* loadUser() {
+function* loadUser(action) {
     try {
-      // yield call(loadUserAPI);
-      const result = yield call(loadUserAPI);
+      const result = yield call(loadUserAPI, action.data);
       yield put({ // put은 dispatch 동일
         type: LOAD_USER_SUCCESS,
         data: result.data,
+        isThisMe: !action.data,   // 내정보 가져올때는 LOAD_USER_REQUEST에 id값을 안 넣는다.
+                            // 내정보 가져올때(매개변수 없을때) 
+                            // -> action.data === false (=값이 없으므로 false)
+                            // -> !action.data === true
+                            // -> action.isThisMe===true로 LOAD_USER_SUCCESS에 넘어간다.
       });
     } catch (e) { // loginAPI 실패
       console.error(e);

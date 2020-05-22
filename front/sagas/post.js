@@ -10,6 +10,15 @@ import {
     LOAD_MAIN_POSTS_FAILURE, 
     LOAD_MAIN_POSTS_REQUEST,
     LOAD_MAIN_POSTS_SUCCESS,
+    LOAD_HASHTAG_POSTS_FAILURE,
+    LOAD_HASHTAG_POSTS_REQUEST,
+    LOAD_HASHTAG_POSTS_SUCCESS,
+    LOAD_USER_POSTS_FAILURE,
+    LOAD_USER_POSTS_REQUEST,
+    LOAD_USER_POSTS_SUCCESS,
+    LOAD_COMMENTS_FAILURE,
+    LOAD_COMMENTS_REQUEST,
+    LOAD_COMMENTS_SUCCESS
 } from '../reducers/post';
 
 /**
@@ -68,16 +77,20 @@ function* watchAddPost() {
 /**
  * 댓글 업로드 3종세트
  */
-function addCommentAPI() {
-    return // 서버에 요청을 보내는 부분 
+function addCommentAPI(data) {
+    // 서버에 요청을 보내는 부분 
+    return axios.post(`/post/${data.postId}/comment`, { content: data.content }, {
+        withCredentials: true,
+    });
 }
 function* addComment(action) {  // 사용자가 댓글 등록하면, 제일 먼저 PostCard.js의 onSubmitComment에서 dispatch 일어남. 이때의 action이 매개변수 action으로 들어온것.
     try {
-        yield delay(2000);
+        const result = yield call(addCommentAPI, action.data);
         yield put({
             type: ADD_COMMENT_SUCCESS,
             data: {
                 postId: action.data.postId,
+                comment: result.data,
             }
         });
     } catch (e) {
@@ -92,12 +105,90 @@ function* watchAddComment() {
     yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
+/**
+ * 게시글의 모든 댓글들 가져오기 3종세트
+ */
+function loadHashtagPostsAPI(tag) {
+    return axios.get(`/hashtag/${tag}`);
+}
+function* loadHashtagPosts(action) {
+    try {
+      const result = yield call(loadHashtagPostsAPI, action.data);
+      yield put({
+        type: LOAD_HASHTAG_POSTS_SUCCESS,
+        data: result.data,
+      });
+    } catch (e) {
+      yield put({
+        type: LOAD_HASHTAG_POSTS_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchLoadHashtagPosts() {
+    yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
+}
+
+/**
+ * 해시태그에 해당하는 게시글 가져오기 3종세트
+ */
+function loadCommentsAPI(postId) {
+    return axios.get(`/post/${postId}/comments`);
+}
+function* loadComments(action) {
+    try {
+      const result = yield call(loadCommentsAPI, action.data);
+      yield put({
+        type: LOAD_COMMENTS_SUCCESS,
+        data: {
+            postId: action.data,
+            comments: result.data,
+        }
+      });
+    } catch (e) {
+      yield put({
+        type: LOAD_COMMENTS_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchLoadComments() {
+    yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
+}
+
+/**
+ * 해당id의 user의 게시글들 가져오기 3종세트
+ */
+function loadUserPostsAPI(id) {
+    return axios.get(`/user/${id}/posts`);
+}
+function* loadUserPosts(action) {
+    try {
+      const result = yield call(loadUserPostsAPI, action.data);
+      yield put({
+        type: LOAD_USER_POSTS_SUCCESS,
+        data: result.data,
+      });
+    } catch (e) {
+      yield put({
+        type: LOAD_USER_POSTS_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchLoadUserPosts() {
+    yield takeLatest(LOAD_USER_POSTS_REQUEST, loadUserPosts);
+}
+
 /* ㅡㅡㅡㅡㅡ main ㅡㅡㅡㅡㅡ*/
 function* postSaga() {
     yield all([
         fork(watchLoadMainPosts),
         fork(watchAddPost),
         fork(watchAddComment),
+        fork(watchLoadComments),
+        fork(watchLoadHashtagPosts),
+        fork(watchLoadUserPosts),
     ]);
 }
 export default postSaga;

@@ -4,7 +4,7 @@ import { Card, Icon, Button, Avatar, Form, Input, List, Comment } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
-import { ADD_COMMENT_REQUEST } from '../reducers/post';
+import { ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST } from '../reducers/post';
 
 const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -13,22 +13,35 @@ const PostCard = ({ post }) => {
   const { commentAdded, isAddingComment } = useSelector(state => state.post);
   const dispatch = useDispatch();
 
+  /* onClick -> 댓글창 열고닫기 */
   const onToggleComment = useCallback(() => {
-    setCommentFormOpened(prev => !prev);
-  }, []);
+    console.log(commentFormOpened);
+    setCommentFormOpened(prev => !prev);  // 현재 루프안에서 즉시 바뀌지는 않음. (현재 루프 끝나면 true로 바뀜)
+                                          // 앞,뒤 console.log()로 확인 해보기 
+    console.log(commentFormOpened);
+    if (!commentFormOpened) { // 닫혀있는 경우에, 댓글 아이콘 눌렀을때(onClick)
+                              // commentFormOpened === false 이면..
+      dispatch({
+        type: LOAD_COMMENTS_REQUEST,
+        data: post.id,
+      });
+    }
+  }, [commentFormOpened]);
 
+  /* 댓글 업로드 */
   const onSubmitComment = useCallback((e) => {
     e.preventDefault();
     if (!me) {
-      return alert('로그인이 필요합니다.');
+      return alert('댓글을 작성하려면, 로그인이 필요합니다.');
     }
     return dispatch({
       type: ADD_COMMENT_REQUEST,
       data: {
         postId: post.id,
+        content: commentText,
       },
     });
-  }, [me && me.id]);
+  }, [me && me.id, commentText]);
 
   useEffect(() => {
     setCommentText('');
@@ -52,14 +65,14 @@ const PostCard = ({ post }) => {
         extra={<Button>팔로우</Button>}
       >
         <Card.Meta
-          avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+          avatar={<Link href={{ pathname: '/user', query: { id: post.User.id } }}><a><Avatar>{post.User.nickname[0]}</Avatar></a></Link>}
           title={post.User.nickname}
           description={(
             <div>
               {post.content.split(/(#[^\s]+)/g).map((v) => {
-                if (v.match(/#[^\s]+/g)) {  // 쪼개진 애가 해시태그면 링크로 바꿔주기
+                if (v.match(/#[^\s]+/)) {  // 쪼개진 애가 해시태그면 링크로 바꿔주기
                   return (
-                    <Link href="/hashtag" key={v}><a>{v}</a></Link>
+                    <Link href={{ pathname: '/hashtag', query: { tag: v.slice(1) } }} key={v}><a>{v}</a></Link>
                   );
                 }
                 return v; // 해시태그(#)가 아니라면, 그냥 문자열만 리턴 
@@ -84,7 +97,7 @@ const PostCard = ({ post }) => {
               <li>
                 <Comment
                   author={item.User.nickname}
-                  avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                  avatar={<Link href={{ pathname: '/user', query: { id: item.User.id } }}><a><Avatar>{item.User.nickname[0]}</Avatar></a></Link>}
                   content={item.content}
                 />
               </li>
