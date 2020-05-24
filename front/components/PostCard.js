@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Card, Icon, Button, Avatar, Form, Input, List, Comment } from 'antd';
+import { RetweetOutlined, HeartOutlined, HeartTwoTone, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Card, Button, Avatar, Form, Input, List, Comment } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
-import { ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST } from '../reducers/post';
+
+import { ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST, UNLIKE_POST_REQUEST, LIKE_POST_REQUEST } from '../reducers/post';
+import PostImages from './PostImages';
 
 const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -13,7 +15,9 @@ const PostCard = ({ post }) => {
   const { commentAdded, isAddingComment } = useSelector(state => state.post);
   const dispatch = useDispatch();
 
-  /* onClick -> 댓글창 열고닫기 */
+  const isLiked = me && post.Likers && post.Likers.find(v => v.id === me.id); // 내가 '좋아요' 했었는지 
+
+  /* onClick 했을때, 댓글창 열고닫기 */
   const onToggleComment = useCallback(() => {
     console.log(commentFormOpened);
     setCommentFormOpened(prev => !prev);  // 현재 루프안에서 즉시 바뀌지는 않음. (현재 루프 끝나면 true로 바뀜)
@@ -43,22 +47,42 @@ const PostCard = ({ post }) => {
     });
   }, [me && me.id, commentText]);
 
+  /* 댓글 작성 완료되면, 댓글 입력창 비워주기 */
   useEffect(() => {
     setCommentText('');
-  }, [commentAdded === true]);
+  }, [commentAdded === true]); 
 
+  /* 댓글이 작성되는 중에 */
   const onChangeCommentText = useCallback((e) => {
     setCommentText(e.target.value);
   }, []);
+
+  /* onClick 했을때, '좋아요' 처리 */
+  const onToggleLike = useCallback(() => {
+    if (!me) {
+      return alert('로그인이 필요합니다.');    // 로그인 안된 사용자는 '좋아요' 클릭 불가
+    }
+    if (isLiked) {   // 내가 '좋아요' 이미 누른 상태이면   
+      dispatch({
+        type: UNLIKE_POST_REQUEST,
+        data: post.id,
+      });
+    } else {
+      dispatch({
+        type: LIKE_POST_REQUEST,
+        data: post.id,
+      });
+    }
+  }, [me && me.id, post && post.id, isLiked]);
 
   return (
     <div>
       <Card
         key={+post.createdAt}
-        cover={post.img && <img alt="example" src={post.img} />}
+        cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
             <RetweetOutlined />,
-            <HeartOutlined />,
+            isLiked ? <HeartTwoTone twoToneColor="#eb2f96" onClick={onToggleLike}/> : <HeartOutlined onClick={onToggleLike}/>,
             <MessageOutlined onClick={onToggleComment}/>,
             <EllipsisOutlined />,
         ]}

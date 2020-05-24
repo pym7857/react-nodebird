@@ -1,9 +1,42 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
 const db = require('../models');
+const { isLoggedIn } = require('./middleware');
+
 const router = express.Router();
 
+/* multer옵션 설정 */
+const upload = multer({     
+    storage: multer.diskStorage({
+        /* 저장경로 설정 */
+        destination(req, file, cb) {
+            cb(null, 'uploads');    // cb(서버에러, 성공했을때)  -> passport의 done이라고 생각하면 됨  
+                                    // cb(null, 'uploads')  -> 저장경로를 uploads폴더로 지정하겠다. 
+        },
+        /* 생성파일 이름 설정 */
+        filename(req, file, cb) {
+            const ext = path.extname(file.originalname);            // path모듈로 확장자 추출 
+            const basename = path.basename(file.originalname, ext)  // path모듈로 확장자 제외한 이름 추출 
+            cb(null, basename + new Date().valueOf() + ext);        // 현재 시간 추가해서 파일이름 작성 
+        },
+        /* 파일용량 제한 설정 */
+        limits: { fileSize: 20 * 1024 * 1024 },
+    }),
+});
+/**
+ * upload.single() : 이미지 한장만 올리면 
+ * upload.array() : 이미지 여러장 올리면 
+ * upload.feilds() : (PostForm.js)FormData에서 append해주는 이름이 다른게 존재할 경우
+ * upload.none() : FormData를 보내긴하는데, 이미지나 파일을 하나도 사용 안 할때 (=text 형식일때)
+ * 
+ * upload.array()안의 이름은, PostForm.js에서 FormData에 append할때 지정했던 이름으로 해야됨
+ */
+
 /* 게시글 작성 */
-router.post('/', async (req, res, next) => {
+router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {     // FormData에서 파일 -> req.file(s)
+                                                                            // FormData에서 일반 값 -> req.body 
     try {
         // 문자열에서 해시태그(#) 뽑아내기
         const hashtags = req.body.content.match(/#[^\s]+/g); // var regExp = /정규표현식/[Flag]; (JS에서 정규표현식 사용법 - 2번째)
@@ -22,50 +55,73 @@ router.post('/', async (req, res, next) => {
             console.log('result=', result); // 이차원 배열 형태 (그래서 r => r[0])
             await newPost.addHashtags(result.map(r => r[0]));   // addHashtags(): sequelize에서 우리가 associate에 맺어놓은 관계를 보고 addHashtags, getHashtags, removeHashtags..등등을 자동 지원한다.
         }
+        /**
+         * multer의 단점
+         * - 이미지 주소를 여러개 올리면 image: [주소1, 주소2]      -> 배열 형식
+         * - 이미지 주소를 한개만 올리면 image: 주소1               -> 그냥 값 
+         */
+        // FormData에서 파일 -> req.file(s)
+        // FormData에서 일반 값 -> req.body 
+        if (req.body.image) {
+            if (Array.isArray(req.body.image)) {    // 배열 형식 이라면 ..
+                /* 배열을 map으로 하고, Promise.all하면 DB의 작업들이 한방에 처리됨 */
+                const images = await Promise.all(req.body.image.map((image) => {
+                    return db.Image.create({ src: image });
+                }));
+                await newPost.addImages(images);    // sequelize에서 addImages() 메서드 추가해줌 
+            } else {
+                /* 이미지 주소를 따로 DB에 저장한 후, 게시글과 연결합니다. */
+                const image = await db.Image.create({ src: req.body.image });
+                await newPost.addImage(image);      // sequelize에서 addImage() 메서드 추가해줌 
+            }
+        }
 
         /* 게시글을 프론트로 보내기 */
         /* 방법1: sequelize에서 제공하는 get 메서드 사용하기 */
+        /*
         const User = await newPost.getUser();   // 게시글과 연관된 사용자만 가져온다. (=게시글과 연관된 사용자는 글쓴이 딱 한명이다.)
         newPost.User = User;                    // Post에 User라는 속성을 달아줌.
                                                 // -> (PostCard.js) post.User.nickname[0].. 이런식으로 사용가능 !! 
         return res.json(newPost);
+        */
 
         /* 방법2: db에서 불러와서 프론트로 전달 */
-        /*
         const fullPost = await db.Post.findOne({
             where: { id: newPost.id },
+            /* include: 게시글 불러올때 user정보와 image정보도 같이 불러온다. */
             include: [{
                 model: db.User, // 게시글과 연관된 사용자만 가져온다. (=게시글과 연관된 사용자는 글쓴이 딱 한명이다.)
                                 // include를 이렇게 '명시'해주면, Post에 User라는 속성을 달아줌.
                                 // -> (PostCard.js) post.User.nickname[0].. 이런식으로 사용가능 !!
+            }, {
+                model: db.Image,    // 프론트에서 Post.Image 로 사용가능 
             }],
         });
         res.json(fullPost);
-        */
     } catch (e) {
         console.error(e);
         return next(e);
     }
 });
 
-router.post('/images', async (req, res, next) => {
-    
+/* 이미지 업로드 라우터 */
+router.post('/images', upload.array('image'), (req, res) => {   // FormData 파일 -> req.file(s)
+                                                                // FormData 일반 값 -> req.body 
+    console.log(req.files);
+    res.json(req.files.map(v => v.filename));   // 이미지 업로드 결과가 v에 담겨있다. 
 });
 
 /* 해당 게시글의 댓글들 가져오기 */
-router.get('/:id/comments', async (req, res, next) => {
+router.get('/:id/comments', isLoggedIn, async (req, res, next) => {
     try {
-        /* 댓글을 가져오려면, 그 댓글의 부모가되는 포스트가 있는지 항상 먼저 검사 */
+        /* 항상, 게시글이 먼저 있는지 확인 */
         const post = await db.Post.findOne({ where: { id: req.params.id } });
-        if(!post) {
-            return res.status(404).send('포스트가 존재하지 않습니다.');
-        }
         /* 해당 게시글의 댓글들 전부 가져오기 */
         const comments = await db.Comment.findAll({
             where: {
                 PostId: req.params.id,
             },
-            order: [['created', 'ASC']], 
+            order: [['createdAt', 'ASC']], 
             include: [{
                 model: db.User,     // 댓글 작성자 정보도 같이 가져오기 
                 attributes: ['id', 'nickname'],
@@ -79,12 +135,9 @@ router.get('/:id/comments', async (req, res, next) => {
 });
 
 /* 해당 게시글에 댓글 작성하기 */
-router.post('/:id/comment', async (req, res, next) => {     // ex) POST/api/post/3/comment
+router.post('/:id/comment', isLoggedIn, async (req, res, next) => {     // ex) POST/api/post/3/comment
     try {
-        if (!req.user) {
-            return res.status(401).send('댓글을 작성하려면 로그인이 필요합니다.');
-        }
-        /* 댓글을 남기려면, 그 댓글의 부모가되는 포스트가 있는지 항상 먼저 검사 */
+        /* 항상, 게시글이 먼저 있는지 확인 */
         const post = await db.Post.findOne({ where: { id: req.params.id } });
         if(!post) {
             return res.status(404).send('포스트가 존재하지 않습니다.');
@@ -112,6 +165,40 @@ router.post('/:id/comment', async (req, res, next) => {     // ex) POST/api/post
     } catch (e) {
         console.error(e);
         return next(e);
+    }
+});
+
+/* 해당 게시글에 '좋아요' 요청이 왔을때 */
+router.post('/:id/like', isLoggedIn, async (req, res, next) => {
+    try {
+        /* 항상, 게시글이 먼저 있는지 확인 */
+        const post = await db.Post.findOne({ where: { id: req.params.id }});
+        if (!post) {
+            return res.status(404).send('포스트가 존재하지 않습니다.');
+        }
+
+        await post.addLiker(req.user.id);
+        res.json({ userId: req.user.id });
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+/* 해당 게시글에 '좋아요' 취소 요청이 왔을때 */
+router.delete('/:id/like', isLoggedIn, async (req, res, next) => {
+    try {
+        /* 항상, 게시글이 먼저 있는지 확인 */
+        const post = await db.Post.findOne({ where: { id: req.params.id }});
+        if (!post) {
+            return res.status(404).send('포스트가 존재하지 않습니다.');
+        }
+
+        await post.removeLiker(req.user.id);
+        res.json({ userId: req.user.id });
+    } catch (e) {
+        console.error(e);
+        next(e);
     }
 });
 

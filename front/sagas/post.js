@@ -18,7 +18,16 @@ import {
     LOAD_USER_POSTS_SUCCESS,
     LOAD_COMMENTS_FAILURE,
     LOAD_COMMENTS_REQUEST,
-    LOAD_COMMENTS_SUCCESS
+    LOAD_COMMENTS_SUCCESS,
+    UPLOAD_IMAGES_FAILURE,
+    UPLOAD_IMAGES_REQUEST,
+    UPLOAD_IMAGES_SUCCESS,
+    LIKE_POST_FAILURE,
+    LIKE_POST_REQUEST,
+    LIKE_POST_SUCCESS,
+    UNLIKE_POST_FAILURE,
+    UNLIKE_POST_REQUEST,
+    UNLIKE_POST_SUCCESS
 } from '../reducers/post';
 
 /**
@@ -36,10 +45,11 @@ function* loadMainPosts() {
         data: result.data,
       });
     } catch (e) {
-      yield put({
-        type: LOAD_MAIN_POSTS_FAILURE,
-        error: e,
-      });
+        console.error(e);
+        yield put({
+            type: LOAD_MAIN_POSTS_FAILURE,
+            error: e,
+        });
     }
 }
 function* watchLoadMainPosts() {
@@ -49,9 +59,9 @@ function* watchLoadMainPosts() {
 /**
  * 게시글 업로드 3종세트
  */
-function addPostAPI(postData) {
+function addPostAPI(formData) {
     // 서버에 요청을 보내는 부분 
-    return axios.post('/post', postData, {
+    return axios.post('/post', formData, {
         withCredentials: true,  // 로그인 한 사람만 글을 쓸 수 있도록 쿠키를 보내줘야한다.(쿠키를 보내서 내가 지금 로그인했는지를 인증받아야 한다.)
     });
 }
@@ -106,7 +116,7 @@ function* watchAddComment() {
 }
 
 /**
- * 게시글의 모든 댓글들 가져오기 3종세트
+ * 특정 해시태그에 해당하는 게시글 가져오기 3종세트
  */
 function loadHashtagPostsAPI(tag) {
     return axios.get(`/hashtag/${tag}`);
@@ -119,18 +129,19 @@ function* loadHashtagPosts(action) {
         data: result.data,
       });
     } catch (e) {
-      yield put({
-        type: LOAD_HASHTAG_POSTS_FAILURE,
-        error: e,
-      });
+        console.error(e);
+        yield put({
+            type: LOAD_HASHTAG_POSTS_FAILURE,
+            error: e,
+        });
     }
 }
 function* watchLoadHashtagPosts() {
     yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
 }
 
-/**
- * 해시태그에 해당하는 게시글 가져오기 3종세트
+ /**
+ * 게시글의 모든 댓글들 가져오기 3종세트
  */
 function loadCommentsAPI(postId) {
     return axios.get(`/post/${postId}/comments`);
@@ -146,10 +157,11 @@ function* loadComments(action) {
         }
       });
     } catch (e) {
-      yield put({
-        type: LOAD_COMMENTS_FAILURE,
-        error: e,
-      });
+        console.error(e);
+        yield put({
+            type: LOAD_COMMENTS_FAILURE,
+            error: e,
+        });
     }
 }
 function* watchLoadComments() {
@@ -157,7 +169,7 @@ function* watchLoadComments() {
 }
 
 /**
- * 해당id의 user의 게시글들 가져오기 3종세트
+ * 특정 id를 가진 user의 게시글들 가져오기 3종세트
  */
 function loadUserPostsAPI(id) {
     return axios.get(`/user/${id}/posts`);
@@ -170,14 +182,102 @@ function* loadUserPosts(action) {
         data: result.data,
       });
     } catch (e) {
-      yield put({
-        type: LOAD_USER_POSTS_FAILURE,
-        error: e,
-      });
+        console.error(e);
+        yield put({
+            type: LOAD_USER_POSTS_FAILURE,
+            error: e,
+        });
     }
 }
 function* watchLoadUserPosts() {
     yield takeLatest(LOAD_USER_POSTS_REQUEST, loadUserPosts);
+}
+
+/**
+ * 이미지 업로드 3종세트
+ */
+function uploadImagesAPI(formData) {
+    return axios.post('/post/images', formData, {   // 게시글을 아직 올리지 않은 상태에서 postId알 수 있는 방법이 없음 
+      withCredentials: true,
+    });
+}
+function* uploadImages(action) {
+    try {
+      const result = yield call(uploadImagesAPI, action.data);
+      yield put({
+        type: UPLOAD_IMAGES_SUCCESS,
+        data: result.data,
+      });
+    } catch (e) {
+      console.error(e);
+      yield put({
+        type: UPLOAD_IMAGES_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchUploadImages() {
+    yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
+
+/**
+ * 좋아요 누르기 3종세트
+ */
+function likePostAPI(postId) {
+    return axios.post(`/post/${postId}/like`, {}, {     // 두번째 인자인 data:{}를 명시는 해놓아야됨 
+      withCredentials: true,
+    });
+}
+function* likePost(action) {
+    try {
+      const result = yield call(likePostAPI, action.data);
+      yield put({
+        type: LIKE_POST_SUCCESS,
+        data: {
+          postId: action.data,          // 게시글 id
+          userId: result.data.userId,   // 좋아요 누른 사람의 id
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      yield put({
+        type: LIKE_POST_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchLikePost() {
+    yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+  
+/**
+ * 좋아요 누르기 취소 3종세트
+ */
+function unlikePostAPI(postId) {
+    return axios.delete(`/post/${postId}/like`, {   // delete는 두번째 인자인 data:{} 부분 없음. 
+      withCredentials: true,
+    });
+}
+function* unlikePost(action) {
+    try {
+      const result = yield call(unlikePostAPI, action.data);
+      yield put({
+        type: UNLIKE_POST_SUCCESS,
+        data: {
+          postId: action.data,          // 게시글 id
+          userId: result.data.userId,   // 좋아요 취소한 사람의 id
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      yield put({
+        type: UNLIKE_POST_FAILURE,
+        error: e,
+      });
+    }
+}
+function* watchUnlikePost() {
+    yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
 
 /* ㅡㅡㅡㅡㅡ main ㅡㅡㅡㅡㅡ*/
@@ -189,6 +289,9 @@ function* postSaga() {
         fork(watchLoadComments),
         fork(watchLoadHashtagPosts),
         fork(watchLoadUserPosts),
+        fork(watchUploadImages),
+        fork(watchLikePost),
+        fork(watchUnlikePost),
     ]);
 }
 export default postSaga;

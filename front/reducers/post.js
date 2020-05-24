@@ -63,6 +63,28 @@ export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 /* Reducer */
 const reducer = (state = initialState, action) => {
     switch (action.type) {
+        case UPLOAD_IMAGES_REQUEST: {
+            return {
+              ...state,
+            };
+        }
+        case UPLOAD_IMAGES_SUCCESS: {
+            return {
+              ...state,
+              imagePaths: [...state.imagePaths, ...action.data],    // 기존 imagePaths배열에 action.data 추가 
+            };
+        }
+        case UPLOAD_IMAGES_FAILURE: {
+            return {
+              ...state,
+            };
+        }
+        case REMOVE_IMAGE: {
+            return {
+                ...state,
+                imagePaths: state.imagePaths.filter((v, i) => i !== action.index),
+            };
+        }
         case LOAD_MAIN_POSTS_REQUEST: 
         case LOAD_HASHTAG_POSTS_REQUEST:
         case LOAD_USER_POSTS_REQUEST: {
@@ -100,6 +122,7 @@ const reducer = (state = initialState, action) => {
                 isAddingPost: false,
                 mainPosts: [action.data, ...state.mainPosts], // dummyPost가 기존에 있던 포스트들 앞에 들어가게 된다.
                 postAdded: true,
+                imagePaths: [],                               // success하는 순간, imagePaths 비워주기 
             };
         }
         case ADD_POST_FAILURE: {
@@ -118,14 +141,12 @@ const reducer = (state = initialState, action) => {
             };
         }
         case ADD_COMMENT_SUCCESS: {
-            // 먼저, 여러개의 게시글 중에 해당 게시글의 index를 도출한 후,
-            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
-            // 해당 게시글을 찾는다
-            const post = state.mainPosts[postIndex];
-            // 불변성을 확보하면서, 뒤에다가 새 댓글 달아준다 
-            const Comments = [...post.Comments, action.data.comment];
-            // mainPosts도 불변성을 확보해 줘야한다.
-            const mainPosts = [...state.mainPosts];
+            /* 항상 불변성을 조심해야 된다. */
+            /* 바뀔 객체만 새로 만들어 줘야된다. */
+            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId); // 먼저, 여러개의 게시글 중에 해당 게시글의 index를 도출한 후,
+            const post = state.mainPosts[postIndex]; // 해당 게시글을 찾는다
+            const Comments = [...post.Comments, action.data.comment]; // 불변성을 확보하면서, 뒤에다가 새 댓글 달아준다 
+            const mainPosts = [...state.mainPosts]; // mainPosts도 불변성을 확보해 줘야한다.
             mainPosts[postIndex] = { ...post, Comments };
 
             return {
@@ -143,14 +164,63 @@ const reducer = (state = initialState, action) => {
             };
         }
         case LOAD_COMMENTS_SUCCESS: {
+            /* 항상 불변성을 조심해야 된다. */
+            /* 바뀔 객체만 새로 만들어 줘야된다. */
             const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
             const post = state.mainPosts[postIndex];
             const Comments = action.data.comments;
             const mainPosts = [...state.mainPosts];
             mainPosts[postIndex] = { ...post, Comments };
+
             return {
               ...state,
               mainPosts,
+            };
+        }
+        case LIKE_POST_REQUEST: {
+            return {
+              ...state,
+            };
+        }
+        case LIKE_POST_SUCCESS: {
+            /* 항상 불변성을 조심해야 된다. */
+            /* 바뀔 객체만 새로 만들어 줘야된다. */
+            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
+            const post = state.mainPosts[postIndex];
+            const Likers = [{ id: action.data.userId }, ...post.Likers];    // 좋아요 누른 사람들 목록에, 본인 추가 
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = { ...post, Likers };
+
+            return {
+              ...state,
+              mainPosts,
+            };
+        }
+        case LIKE_POST_FAILURE: {
+            return {
+              ...state,
+            };
+        }
+        case UNLIKE_POST_REQUEST: {
+            return {
+              ...state,
+            };
+        }
+        case UNLIKE_POST_SUCCESS: {
+            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
+            const post = state.mainPosts[postIndex];
+            const Likers = post.Likers.filter(v => v.id !== action.data.userId);  // 좋아요 누른 사람들 목록에, 본인 제외  
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = { ...post, Likers };
+
+            return {
+              ...state,
+              mainPosts,
+            };
+        }
+        case UNLIKE_POST_FAILURE: {
+            return {
+              ...state,
             };
         }
         default: {

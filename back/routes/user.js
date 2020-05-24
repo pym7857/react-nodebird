@@ -1,18 +1,16 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+
+const { isLoggedIn } = require('./middleware');
 const db = require('../models');
 
 const router = express.Router();
 
 /* 페이지 새로 불러올때마다, 유저 정보(req.user) 받아오기 */
-router.get('/', (req, res) => {
-    if (!req.user) {  // deserializaUser가 req.user 생성 
-      return res.status(401).send('유저 정보를 받아오기 위해서는, 로그인이 필요합니다.'); // 401에러는 로그인하면 없어짐 
-    }
+router.get('/', isLoggedIn, (req, res) => {
     const user = Object.assign({}, req.user.toJSON()); // 객체 복사해서 (toJSON() 안붙이면 에러),
     delete user.password;                               // 비밀번호 지우고 정보 보내기 
-    console.log('로그인 되면 보내는 user=', user);
     return res.json(user);
 });
 
@@ -146,13 +144,20 @@ router.get('/:id/posts', async (req, res, next) => {
     try {
       const posts = await db.Post.findAll({
         where: {
-          UserId: parseInt(req.params.id, 10),  // post테이블의 UserId필드
+          UserId: parseInt(req.params.id, 10), // post테이블의 UserId필드
           RetweetId: null,
         },
         include: [{
           model: db.User,
-          attributes: ['id', 'nickname'], // 사용자 정보 가져오기 
-        }]
+          attributes: ['id', 'nickname'],     // 사용자 정보 가져오기 
+        }, {
+          model: db.Image,                    // 게시글 이미지 가져오기 
+        }, {
+          model: db.User,
+          through: 'Like',                    // 게시글 좋아요 누른사람을 include 
+          as: 'Likers',
+          attributes: ['id'],
+      }]
       });
       res.json(posts);
     } catch (e) {

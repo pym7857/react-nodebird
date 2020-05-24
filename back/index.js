@@ -19,6 +19,10 @@ db.sequelize.sync(); // 알아서 models폴더안에 정의해놓은 db테이블
 passportConfig();
 
 app.use(morgan('dev'));
+app.use('/', express.static('uploads'));    // static 메서드에 폴더명을 지정해주면, 다른서버에서 폴더안의 파일을 가져갈 수 있도록 해줌 
+                                            // 앞의 '/'는 프론트에서 접근하는 주소가 된다. 
+                                            // ex) '/files'로 지정해놓으면, 프론트에서도 /files/파일명.png 로 접근해야한다. 
+                                            // 현재는 PostForm.js에서 <img src={`http://localhost:3065/${v}`} ...>에서 처럼 '/'로 접근 가능
 app.use(express.json());                            // 프론트에서 백으로 보낸 데이터를 req.body에 넣어주는 역할
 app.use(express.urlencoded({ extended: true }));    // 프론트에서 백으로 보낸 데이터를 req.body에 넣어주는 역할
 app.use(cors({
