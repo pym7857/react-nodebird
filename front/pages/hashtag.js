@@ -11,7 +11,7 @@ const Hashtag = ({ tag }) => {
 
     useEffect(() => {
         dispatch({
-          type: LOAD_HASHTAG_POSTS_REQUEST,
+          type: LOAD_HASHTAG_POSTS_REQUEST,     // 해당 해시태그 게시글들 가져오기 요청 
           data: tag,
         });
     }, []); // ComponentDidMount

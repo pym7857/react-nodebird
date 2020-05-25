@@ -6,7 +6,6 @@ import { LOG_OUT_REQUEST } from '../reducers/user';
 
 const UserProfile = () => {
     const { me } = useSelector(state => state.user);
-    //console.log(me);
     const dispatch = useDispatch();
 
     const onLogout = useCallback(() => {    // useCallback으로 감싸는 이유는 자식컴포넌트에 props로 전달하기 때문

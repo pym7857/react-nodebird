@@ -15,13 +15,27 @@ router.get('/:tag', async (req, res, next) => {
             {
                 model: db.User,
                 attributes: ['id', 'nickname'],
-            }, {
+            }, 
+            {
                 model: db.Image,                // 게시글 이미지 가져오기 
-            }, {
+            }, 
+            {
                 model: db.User,
                 through: 'Like',                // 게시글 좋아요 누른사람을 include 
                 as: 'Likers',
                 attributes: ['id'],
+            }, 
+            {
+                model: db.Post,                 // 리트윗한 게시글 정보 
+                as: 'Retweet',
+                include: [
+                {
+                    model: db.User,             // 리트윗한 게시글의 작성자 정보 
+                    attributes: ['id', 'nickname'],
+                }, 
+                {
+                    model: db.Image,            // 리트윗한 게시글의 이미지 정보 
+                }],
             }],
         });
         res.json(posts);

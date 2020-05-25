@@ -223,6 +223,22 @@ const reducer = (state = initialState, action) => {
               ...state,
             };
         }
+        case RETWEET_REQUEST: {
+            return {
+              ...state,
+            };
+        }
+        case RETWEET_SUCCESS: {
+            return {
+              ...state,
+              mainPosts: [action.data, ...state.mainPosts],     // 기존 게시글의 제일 앞에 추가해준다. 
+            };
+        }
+        case RETWEET_FAILURE: {
+            return {
+              ...state,
+            };
+        }
         default: {
             return {
                 ...state,

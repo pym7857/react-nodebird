@@ -123,42 +123,101 @@ router.post('/login', (req, res, next) => {
       })(req, res, next);
 });
 
-router.get('/:id/follow', (req, res) => {
-
+/* 팔로우 하기 라우터 */
+router.post('/:id/follow', isLoggedIn, async (req, res, next) => {
+  try {
+    const me = await db.User.findOne({
+      where: { id: req.user.id },
+    });
+    await me.addFollowing(req.params.id);   // add(): 시퀄라이즈에서 알아서 연결해줌 
+    res.send(req.params.id);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
-router.post('/:id/follow', (req, res) => {
-
+/* 언팔로우 하기 라우터 */
+router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
+  try {
+    const me = await db.User.findOne({
+      where: { id: req.user.id },
+    });
+    await me.removeFollowing(req.params.id);   // remove(): 시퀄라이즈에서 알아서 삭제해줌  
+    res.send(req.params.id);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
-router.delete('/:id/follow', (req, res) => {
-
+/* 내가 팔로잉 하고있는 사람들 목록 가져오기 라우터 */
+router.get('/:id/followings', isLoggedIn, async (req, res, next) => { // /api/user/:id/followings
+  try {
+    const user = await db.User.findOne({
+      where: { id: parseInt(req.params.id, 10) },
+    });
+    const myFollowings = await user.getFollowings({   // get() - sequelize에서 제공 
+      attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
+    });
+    res.json(myFollowings);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
-router.delete('/:id/follower', (req, res) => {
+/* 내 팔로워들 목록 가져오기 라우터 */
+router.get('/:id/followers', isLoggedIn, async (req, res, next) => { // /api/user/:id/followers
+  try {
+    const user = await db.User.findOne({
+      where: { id: parseInt(req.params.id, 10) },
+    });
+    const myFollowers = await user.getFollowers({     // get() - sequelize에서 제공 
+      attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
+    });
+    res.json(myFollowers);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
+});
 
+/* 팔로워 한명 삭제하기 라우터 */
+router.delete('/:id/follower', isLoggedIn, async (req, res, next) => {
+  try {
+    const me = await db.User.findOne({
+      where: { id: req.user.id },
+    });
+    await me.removeFollower(req.params.id);     // remove() - sequelize에서 제공 
+    res.send(req.params.id);
+  } catch (e) {
+    console.error(e);
+    next(e);
+  }
 });
 
 /* 특정id의user의 게시글들 가져오기 */
+/* 이 경우에는, 리트윗 게시글 가져오지 않아도 됨 */
 router.get('/:id/posts', async (req, res, next) => {
     try {
       const posts = await db.Post.findAll({
         where: {
-          UserId: parseInt(req.params.id, 10), // post테이블의 UserId필드
-          RetweetId: null,
+          UserId: parseInt(req.params.id, 10),  // post테이블의 UserId필드
+          RetweetId: null,                      // 리트윗 게시글 X
         },
         include: [{
           model: db.User,
-          attributes: ['id', 'nickname'],     // 사용자 정보 가져오기 
+          attributes: ['id', 'nickname'],       // 사용자 정보 가져오기 
         }, {
-          model: db.Image,                    // 게시글 이미지 가져오기 
+          model: db.Image,                      // 게시글 이미지 가져오기 
         }, {
           model: db.User,
-          through: 'Like',                    // 게시글 좋아요 누른사람을 include 
+          through: 'Like',                      // 게시글 좋아요 누른사람을 include 
           as: 'Likers',
           attributes: ['id'],
       }]
-      });
+    });
       res.json(posts);
     } catch (e) {
       console.error(e);

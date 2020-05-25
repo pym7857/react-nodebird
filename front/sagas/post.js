@@ -27,8 +27,12 @@ import {
     LIKE_POST_SUCCESS,
     UNLIKE_POST_FAILURE,
     UNLIKE_POST_REQUEST,
-    UNLIKE_POST_SUCCESS
+    UNLIKE_POST_SUCCESS,
+    RETWEET_FAILURE,
+    RETWEET_REQUEST,
+    RETWEET_SUCCESS
 } from '../reducers/post';
+import { ADD_POST_TO_ME } from '../reducers/user';
 
 /**
  * 게시글 불러오기 3종세트
@@ -68,9 +72,13 @@ function addPostAPI(formData) {
 function* addPost(action) {
     try {
         const result = yield call(addPostAPI, action.data);
-        yield put({
+        yield put({   // post reducer의 데이터를 수정하는 부분 
             type: ADD_POST_SUCCESS,
             data: result.data,
+        });
+        yield put({   // user reducer의 데이터를 수정하는 부분 
+          type: ADD_POST_TO_ME,
+          data: result.data.id,
         });
     } catch (e) {
         console.error(e);
@@ -280,6 +288,35 @@ function* watchUnlikePost() {
     yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
 
+/**
+ * 리트윗 3종세트
+ */
+function retweetAPI(postId) {
+  return axios.post(`/post/${postId}/retweet`, {}, {    // post 요청 시에는 data가 없더라도 빈 객체 {} 라도 넣어줘야 한다. 
+    withCredentials: true,
+  });
+}
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: RETWEET_FAILURE,
+      error: e,
+    });
+    console.dir(e);
+    alert(e.response && e.response.data);   // alert로 에러 정보 알려주기 
+  }
+}
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
+
 /* ㅡㅡㅡㅡㅡ main ㅡㅡㅡㅡㅡ*/
 function* postSaga() {
     yield all([
@@ -292,6 +329,7 @@ function* postSaga() {
         fork(watchUploadImages),
         fork(watchLikePost),
         fork(watchUnlikePost),
+        fork(watchRetweet),
     ]);
 }
 export default postSaga;

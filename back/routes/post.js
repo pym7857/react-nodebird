@@ -89,11 +89,13 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {     // F
         const fullPost = await db.Post.findOne({
             where: { id: newPost.id },
             /* include: 게시글 불러올때 user정보와 image정보도 같이 불러온다. */
-            include: [{
+            include: [
+            {
                 model: db.User, // 게시글과 연관된 사용자만 가져온다. (=게시글과 연관된 사용자는 글쓴이 딱 한명이다.)
                                 // include를 이렇게 '명시'해주면, Post에 User라는 속성을 달아줌.
                                 // -> (PostCard.js) post.User.nickname[0].. 이런식으로 사용가능 !!
-            }, {
+            }, 
+            {
                 model: db.Image,    // 프론트에서 Post.Image 로 사용가능 
             }],
         });
@@ -116,6 +118,9 @@ router.get('/:id/comments', isLoggedIn, async (req, res, next) => {
     try {
         /* 항상, 게시글이 먼저 있는지 확인 */
         const post = await db.Post.findOne({ where: { id: req.params.id } });
+        if (!post) {
+            return res.status(404).send('포스트가 존재하지 않습니다.');
+          }
         /* 해당 게시글의 댓글들 전부 가져오기 */
         const comments = await db.Comment.findAll({
             where: {
@@ -127,7 +132,7 @@ router.get('/:id/comments', isLoggedIn, async (req, res, next) => {
                 attributes: ['id', 'nickname'],
             }],
         });
-        return res.json(comments);
+        res.json(comments);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -161,7 +166,7 @@ router.post('/:id/comment', isLoggedIn, async (req, res, next) => {     // ex) P
                 attributes: ['id', 'nickname'],
             }],
         });
-        return res.json(comment);
+        res.json(comment);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -177,7 +182,7 @@ router.post('/:id/like', isLoggedIn, async (req, res, next) => {
             return res.status(404).send('포스트가 존재하지 않습니다.');
         }
 
-        await post.addLiker(req.user.id);
+        await post.addLiker(req.user.id);   // post.Likers로 프론트에서 사용 가능 
         res.json({ userId: req.user.id });
     } catch (e) {
         console.error(e);
@@ -196,6 +201,72 @@ router.delete('/:id/like', isLoggedIn, async (req, res, next) => {
 
         await post.removeLiker(req.user.id);
         res.json({ userId: req.user.id });
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+/* 리트윗 라우터 */
+router.post('/:id/retweet', isLoggedIn, async (req, res, next) => {
+    try {
+        /* 항상, 게시글이 먼저 있는지 확인 */
+        const post = await db.Post.findOne({ 
+            where: { id: req.params.id },
+            include: [{
+                model: db.Post,
+                as: 'Retweet',
+            }],
+        });
+        if (!post) {
+            return res.status(404).send('포스트가 존재하지 않습니다.');
+        }
+        /* 게시글 작성자가 본인일 경우, 리트윗 못하도록 */
+        /* 또는 남이 리트윗한 게시물의 원래 작성자가 본인일 경우, 리트윗 못하도록 */
+        if (req.user.id === post.UserId || (post.Retweet && post.Retweet.UserId === req.user.id)) {
+            return res.status(403).send('자신의 글은 리트윗할 수 없습니다.');
+        }
+        /* 다른사람이 리트윗한 게시글을 또 리트윗 하는 경우  or 원본 게시글을 리트윗하는 경우 */
+        const retweetTargetId = post.RetweetId || post.id;  
+        /* 리트윗 하려는 게시글을 이미 리트윗 했었는지 */
+        const exPost = await db.Post.findOne({
+            where: {
+                UserId: req.user.id,
+                RetweetId: retweetTargetId,
+            },
+        });
+        if (exPost) {
+            return res.status(403).send('이미 리트윗 한 게시글 입니다.');
+        }
+        /* 리트윗을 한 게시글 객체 생성 */
+        const retweet = await db.Post.create({
+            UserId: req.user.id,
+            RetweetId: retweetTargetId,
+            content: 'retweet',     // allowNull: false 
+        });
+        /* 리트윗 게시글의 특성: 항상 이전 게시글을 가지고 있어야 한다. */
+        /* 리트윗한 게시글안에 남의 게시글이 들어있어야 한다. */
+        const retweetWithPrevPost = await db.Post.findOne({
+            where: { id: retweet.id },
+            include: [
+            {
+                model: db.User,         // 작성자 정보 
+                attributes: ['id', 'nickname'],
+            }, 
+            {
+                model: db.Post,         // 리트윗한 게시글 정보 
+                as: 'Retweet',
+                include: [
+                {
+                    model: db.User,     // 리트윗한 게시글의 작성자 정보 
+                    attributes: ['id', 'nickname'],
+                }, 
+                {
+                    model: db.Image,    // 리트윗한 게시글의 이미지 정보 
+                }],
+            }],
+        });
+        res.json(retweetWithPrevPost);
     } catch (e) {
         console.error(e);
         next(e);
