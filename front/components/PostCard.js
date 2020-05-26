@@ -79,6 +79,7 @@ const PostCard = ({ post }) => {
       dispatch({
         type: LIKE_POST_REQUEST,
         data: post.id,
+          
       });
     }
   }, [me && me.id, post && post.id, isLiked]);
@@ -111,7 +112,7 @@ const PostCard = ({ post }) => {
     <div>
       <Card
         key={+post.createdAt}
-        cover={post.Images[0] && <PostImages images={post.Images} />}
+        cover={post.Images && post.Images[0] && <PostImages images={post.Images} />}
         actions={[
             <RetweetOutlined onClick={onRetweet}/>,
             isLiked ? <HeartTwoTone twoToneColor="#eb2f96" onClick={onToggleLike}/> : <HeartOutlined onClick={onToggleLike}/>,

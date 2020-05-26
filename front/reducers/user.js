@@ -8,18 +8,21 @@ const dummyUser = {
 };
 
 export const initialState = {
-    isLoggingOut: false,    // 로그아웃 시도 중
-    isLogginIn: false,      // 로그인 시도 중 
-    logInErrorReason: '',   // 로그인 에러 사유
+    isLoggingOut: false,          // 로그아웃 시도 중
+    isLogginIn: false,            // 로그인 시도 중 
+    logInErrorReason: '',         // 로그인 에러 사유
 
-    signedUp: false,        // 회원가입 성공
-    isSignedUp: false,      // 회원가입 시도 중
-    signUpErrorReason: '',  // 회원가입 에러 사유
+    signedUp: false,              // 회원가입 성공
+    isSignedUp: false,            // 회원가입 시도 중
+    signUpErrorReason: '',        // 회원가입 에러 사유
 
-    me: null,               // 내 정보
+    me: null,                     // 내 정보
     followingList: [],
     followerList: [],              
-    userInfo: null,         // 남의 정보 
+    userInfo: null,               // 남의 정보 
+
+    isEditingNickname: false,     // 닉네임 변경 중 
+    editNicknameErrorReason: '',  // 닉네임 변경 실패 사유 
 };
 
 /* Action의 이름 */
@@ -252,6 +255,30 @@ const reducer = (state = initialState, action) => {
             return {
               ...state,
             };
+        }
+        case EDIT_NICKNAME_REQUEST: {
+          return {
+            ...state,
+            isEditingNickname: true,
+            editNicknameErrorReason: '',
+          };
+        }
+        case EDIT_NICKNAME_SUCCESS: {
+          return {
+            ...state,
+            isEditingNickname: false,
+            me: {
+              ...state.me,
+              nickname: action.data,
+            },
+          };
+        }
+        case EDIT_NICKNAME_FAILURE: {
+          return {
+            ...state,
+            isEditingNickname: false,
+            editNicknameErrorReason: action.error,
+          };
         }
         default: {
             return {

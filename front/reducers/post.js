@@ -8,6 +8,7 @@ export const initialState = {
     isAddingComment: false,     // 댓글 업로드 중 
     addCommentErrorReason: '',  // 댓글 업로드 에러 사유 
     commentAdded: false,        // 댓글이 추가되었는지 (쓰는 이유: 댓글 작성후, 이게 true가 되면 TextArea 비워주기 위해서)
+    addLikeErrorReason: '',
 };
 
 /* Action의 이름 */
@@ -120,7 +121,7 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAddingPost: false,
-                mainPosts: [action.data, ...state.mainPosts], // dummyPost가 기존에 있던 포스트들 앞에 들어가게 된다.
+                mainPosts: [action.data, ...state.mainPosts], // 포스트들 앞에 들어가게 된다.
                 postAdded: true,
                 imagePaths: [],                               // success하는 순간, imagePaths 비워주기 
             };
@@ -197,8 +198,10 @@ const reducer = (state = initialState, action) => {
             };
         }
         case LIKE_POST_FAILURE: {
+            alert('좋아요 실패!');
             return {
               ...state,
+              addLikeErrorReason: action.error,
             };
         }
         case UNLIKE_POST_REQUEST: {

@@ -165,7 +165,7 @@ function* loadComments(action) {
         }
       });
     } catch (e) {
-        console.error(e);
+        console.error('왜 댓글안돼=', e);
         yield put({
             type: LOAD_COMMENTS_FAILURE,
             error: e,

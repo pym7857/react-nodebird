@@ -18,7 +18,7 @@ const AppLayout = ({ children }) => {
       dispatch({
         type: LOAD_USER_REQUEST,  // 내 정보 불러오기 ( 쿠키를 이용하여.. -> sagas/user.js의 loadUserAPI() 참조 )
                                   // 로그인을 안한 상태면, 쿠키도 없을테니 LOAD_USER_REQUEST 불가 
-      })
+      });
     }
   }, []); // ComponentDidMount
 

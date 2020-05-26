@@ -28,6 +28,9 @@ import {
     REMOVE_FOLLOWER_FAILURE,
     REMOVE_FOLLOWER_REQUEST,
     REMOVE_FOLLOWER_SUCCESS,
+    EDIT_NICKNAME_FAILURE, 
+    EDIT_NICKNAME_REQUEST,
+    EDIT_NICKNAME_SUCCESS
 } from '../reducers/user';
 
 /**
@@ -282,6 +285,34 @@ function* watchRemoveFollower() {
   yield takeEvery(REMOVE_FOLLOWER_REQUEST, removeFollower);
 }
 
+/**
+ * 닉네임 수정 3종세트
+ */
+function editNicknameAPI(nickname) {
+  // 서버에 요청을 보내는 부분
+  return axios.patch('/user/nickname', { nickname }, {  // 부분 수정: patch, 전체 수정: put
+    withCredentials: true,
+  });
+}
+function* editNickname(action) {
+  try {
+    const result = yield call(editNicknameAPI, action.data);
+    yield put({ // put은 dispatch 동일
+      type: EDIT_NICKNAME_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) { 
+    console.error(e);
+    yield put({
+      type: EDIT_NICKNAME_FAILURE,
+      error: e,
+    });
+  }
+}
+function* watchEditNickname() {
+  yield takeEvery(EDIT_NICKNAME_REQUEST, editNickname);
+}
+
 /* ㅡㅡㅡㅡㅡ main ㅡㅡㅡㅡㅡ*/
 function* userSaga() {
     yield all([
@@ -294,6 +325,7 @@ function* userSaga() {
         fork(watchLoadFollowers),
         fork(watchLoadFollowings),
         fork(watchRemoveFollower),
+        fork(watchEditNickname),
     ]);
 }
 export default userSaga;

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Button, List, Card } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +17,7 @@ const Profile = () => {
     const dispatch = useDispatch();
     const { me, followingList, followerList } = useSelector(state => state.user);
     const { mainPosts } = useSelector(state => state.post);
-
+    
     useEffect(() => {
         if (me) {
             dispatch({

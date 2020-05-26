@@ -114,7 +114,7 @@ router.post('/images', upload.array('image'), (req, res) => {   // FormData 파�
 });
 
 /* 해당 게시글의 댓글들 가져오기 */
-router.get('/:id/comments', isLoggedIn, async (req, res, next) => {
+router.get('/:id/comments', async (req, res, next) => {
     try {
         /* 항상, 게시글이 먼저 있는지 확인 */
         const post = await db.Post.findOne({ where: { id: req.params.id } });
@@ -180,6 +180,10 @@ router.post('/:id/like', isLoggedIn, async (req, res, next) => {
         const post = await db.Post.findOne({ where: { id: req.params.id }});
         if (!post) {
             return res.status(404).send('포스트가 존재하지 않습니다.');
+        }
+        /* 게시글의 작성자와 현재 유저가 같다면  */
+        if (post.UserId === req.user.id) {
+            return res.status(403).send('본인 게시글에는 좋아요 할 수 없습니다.');
         }
 
         await post.addLiker(req.user.id);   // post.Likers로 프론트에서 사용 가능 
