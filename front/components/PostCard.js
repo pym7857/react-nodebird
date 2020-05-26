@@ -205,7 +205,7 @@ const PostCard = ({ post }) => {
 };
 
 PostCard.propTypes = {
-  post: PropTypes.shape({
+    post: PropTypes.shape({
     User: PropTypes.object,
     content: PropTypes.string,
     img: PropTypes.string,

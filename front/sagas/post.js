@@ -127,7 +127,7 @@ function* watchAddComment() {
  * 특정 해시태그에 해당하는 게시글 가져오기 3종세트
  */
 function loadHashtagPostsAPI(tag) {
-    return axios.get(`/hashtag/${tag}`);
+    return axios.get(`/hashtag/${encodeURIComponent(tag)}`);
 }
 function* loadHashtagPosts(action) {
     try {
@@ -180,7 +180,7 @@ function* watchLoadComments() {
  * 특정 id를 가진 user의 게시글들 가져오기 3종세트
  */
 function loadUserPostsAPI(id) {
-    return axios.get(`/user/${id}/posts`);
+    return axios.get(`/user/${id || 0}/posts`);
 }
 function* loadUserPosts(action) {
     try {

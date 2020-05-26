@@ -155,7 +155,7 @@ router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
 router.get('/:id/followings', isLoggedIn, async (req, res, next) => { // /api/user/:id/followings
   try {
     const user = await db.User.findOne({
-      where: { id: parseInt(req.params.id, 10) },
+      where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
     });
     const myFollowings = await user.getFollowings({   // get() - sequelize에서 제공 
       attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
@@ -171,7 +171,7 @@ router.get('/:id/followings', isLoggedIn, async (req, res, next) => { // /api/us
 router.get('/:id/followers', isLoggedIn, async (req, res, next) => { // /api/user/:id/followers
   try {
     const user = await db.User.findOne({
-      where: { id: parseInt(req.params.id, 10) },
+      where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
     });
     const myFollowers = await user.getFollowers({     // get() - sequelize에서 제공 
       attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
@@ -203,7 +203,7 @@ router.get('/:id/posts', async (req, res, next) => {
     try {
       const posts = await db.Post.findAll({
         where: {
-          UserId: parseInt(req.params.id, 10),  // post테이블의 UserId필드
+          UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,     // parseInt(req.params.id, 10)가 0 이라면, || 다음부분 실행 !  (숫자 0은 false 이기 때문)
           RetweetId: null,                      // 리트윗 게시글 X
         },
         include: [{

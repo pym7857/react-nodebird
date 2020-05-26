@@ -12,7 +12,7 @@ const User = ({ id }) => {
     const { mainPosts } = useSelector(state => state.post);
     const { userInfo } = useSelector(state => state.user);
 
-    useEffect(() => {
+    /* useEffect(() => {
         dispatch({
           type: LOAD_USER_REQUEST,          // 남의 정보
           data: id,
@@ -21,7 +21,7 @@ const User = ({ id }) => {
           type: LOAD_USER_POSTS_REQUEST,    // 남의 게시글 
           data: id,
         });
-    }, []); // ComponentDidMount
+    }, []);  */
 
     return (
         <div>
@@ -65,9 +65,25 @@ User.propTypes = {
     id: PropTypes.number.isRequired,
 };
 
-User.getInitialProps = async (context) => {
+/* User.getInitialProps = async (context) => {          // _app.js의 (ctx) -> Hashtag.getInitialProps에서 (context)로 받는다. 
     console.log(context.query.id);
-    return { id: parseInt(context.query.id, 10) };
-  };
+    return { id: parseInt(context.query.id, 10) };      // return 값이 (_app.js)NodeBird.getInitialProps의 pageProps에 담긴다
+}; */
+
+User.getInitialProps = async (context) => { 
+    console.log('id=', context.query.id);
+    const id = parseInt(context.query.id, 10);
+
+    context.store.dispatch({
+        type: LOAD_USER_REQUEST,          // 남의 정보
+        data: id,
+    });
+
+    context.store.dispatch({
+        type: LOAD_USER_POSTS_REQUEST,    // 남의 게시글 
+        data: id,
+    });
+    return { id };                        // return 값이 (_app.js)NodeBird.getInitialProps의 pageProps에 담긴다
+};
 
 export default User;

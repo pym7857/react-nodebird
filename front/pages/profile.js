@@ -18,7 +18,7 @@ const Profile = () => {
     const { me, followingList, followerList } = useSelector(state => state.user);
     const { mainPosts } = useSelector(state => state.post);
     
-    useEffect(() => {
+    /* useEffect(() => {
         if (me) {
             dispatch({
                 type: LOAD_FOLLOWERS_REQUEST,
@@ -33,7 +33,7 @@ const Profile = () => {
                 data: me.id,
             });
         }
-    }, [me && me.id]);
+    }, [me && me.id]); */
 
     const onUnfollow = useCallback(userId => () => {
         dispatch({
@@ -98,6 +98,26 @@ const Profile = () => {
             </div>
         </div>
     );
+};
+
+Profile.getInitialProps = async (context) => {
+    const state = context.store.getState();
+
+    /* 이 직전에 (_app.js)LOAD_USER_REQUEST */
+    context.store.dispatch({
+        type: LOAD_FOLLOWERS_REQUEST,              
+        data: state.user.me && state.user.me.id,
+    });
+    context.store.dispatch({
+        type: LOAD_FOLLOWINGS_REQUEST,             
+        data: state.user.me && state.user.me.id,
+    });
+    context.store.dispatch({
+        type: LOAD_USER_POSTS_REQUEST,               
+        data: state.user.me && state.user.me.id,
+    });
+
+    /* 여기서 LOAD_USER_SUCCESS 되서, me가 생김 */
 };
 
 export default Profile;

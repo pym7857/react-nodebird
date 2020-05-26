@@ -10,11 +10,11 @@ const Home = () => {
   const { mainPosts } = useSelector(state => state.post);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  /* useEffect(() => {
     dispatch({
       type: LOAD_MAIN_POSTS_REQUEST,
     });
-  }, []); // ComponentDidMount
+  }, []); */
 
   return (
     <div>
@@ -30,4 +30,14 @@ const Home = () => {
     </div>
   );
 };
+
+Home.getInitialProps = async (context) => {   // _app.js의 (context.ctx)를 각 컴포넌트에서는 (context)로 받는다.
+  console.log(Object.keys(context));          // ['err','req','res','pathname','query','asPath','store','isServer']
+                                              // 이 중에, 'store'가 redux store이다. 
+                                              // 이 'store'안에는 dispatch(), getState()가 들어있다. 
+  context.store.dispatch({
+    type: LOAD_MAIN_POSTS_REQUEST,
+  });
+};
+
 export default Home;
