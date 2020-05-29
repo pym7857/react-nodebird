@@ -46,7 +46,7 @@ app.prepare().then(() => {
         return handle(req, res);
     });
 
-    server.listen(3061, () => {
-        console.log('next-express running on port 3061');
+    server.listen(3062, () => {
+        console.log('next-express running on port 3062');
     });
 });

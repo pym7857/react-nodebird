@@ -6,6 +6,8 @@ import { CloseOutlined } from '@ant-design/icons';
 const ImagesZoom = ({ images, onClose }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    const backURL = 'http://localhost:3067';
+
     return (
         <div style={{ position: 'fixed', zIndex: 5000, top: 0, left: 0, right: 0, bottom: 0 }}>
             <header style={{ height: 44, background: 'white', position: 'relative', padding: 0, textAlign: 'center'}}>
@@ -26,7 +28,7 @@ const ImagesZoom = ({ images, onClose }) => {
                         {images.map((v) => {
                             return (
                                 <div style={{ padding: 32, textAlign: 'center' }}>
-                                    <img src={ `http://localhost:3065/${v.src}` } style={{ margin: '0 auto', maxHeight: 750 }}/>
+                                    <img src={ `${backURL}/${v.src}` } style={{ margin: '0 auto', maxHeight: 750 }}/>
                                 </div>
                             );
                         })}

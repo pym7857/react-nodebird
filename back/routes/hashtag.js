@@ -5,7 +5,18 @@ const router = express.Router();
 
 router.get('/:tag', async (req, res, next) => {
     try {
+        // 분기처리 
+        let where = {};
+        if (parseInt(req.query.lastId, 10)) {       // lastId가 0이 아니라면(0은 false)
+            where = {
+                id : {
+                    [db.Sequelize.Op.lt] : parseInt(req.query.lastId, 10),  // sequelize operator사용. 
+                                                                            // lt = less than
+                },
+            };
+        }
         const posts = await db.Post.findAll({
+            where,
             /* include: 게시글 불러올때, 해당 해시태그, user정보, image정보 같이 불러온다. */
             include: [
             {
@@ -37,6 +48,8 @@ router.get('/:tag', async (req, res, next) => {
                     model: db.Image,            // 리트윗한 게시글의 이미지 정보 
                 }],
             }],
+            order: [['createdAt', 'DESC']],
+            limit: parseInt(req.query.limit, 10),
         });
         res.json(posts);
     } catch (e) {

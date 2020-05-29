@@ -6,6 +6,8 @@ import ImagesZoom from './ImagesZoom';
 const PostImages = ({ images }) => {
     const [showImagesZoom, setShowImagesZoom] = useState(false);    // 확대 이미지를 보여줄지 말지 
 
+    const backURL = 'http://localhost:3067';
+
     const onZoom = useCallback(() => {
         setShowImagesZoom(true);
     }, []);
@@ -18,7 +20,7 @@ const PostImages = ({ images }) => {
     if (images.length === 1) {  // 이미지가 1장 일때 
         return (
             <>
-                <img src={`http://localhost:3065/${images[0].src}`} onClick={onZoom}/>
+                <img src={`${backURL}/${images[0].src}`} onClick={onZoom}/>
                 {showImagesZoom && <ImagesZoom images={images} onClose={onClose}/>}
             </>
         );
@@ -27,8 +29,8 @@ const PostImages = ({ images }) => {
         return (
             <>
                 <div>
-                    <img src={`http://localhost:3065/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
-                    <img src={`http://localhost:3065/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
                 </div>
                 {showImagesZoom && <ImagesZoom images={images} onClose={onClose}/>}
             </>
@@ -38,9 +40,9 @@ const PostImages = ({ images }) => {
         return (
             <>
                 <div>
-                    <img src={`http://localhost:3065/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
-                    <img src={`http://localhost:3065/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
-                    <img src={`http://localhost:3065/${images[2].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[2].src}`} width="50%" height="50%" onClick={onZoom}/>
                 </div>
                 {showImagesZoom && <ImagesZoom images={images} onClose={onClose}/>}
             </>
@@ -50,10 +52,10 @@ const PostImages = ({ images }) => {
         return (
             <>
                 <div>
-                    <img src={`http://localhost:3065/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
-                    <img src={`http://localhost:3065/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[0].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[1].src}`} width="50%" height="50%" onClick={onZoom}/>
                     <br />
-                    <img src={`http://localhost:3065/${images[2].src}`} width="50%" height="50%" onClick={onZoom}/>
+                    <img src={`${backURL}/${images[2].src}`} width="50%" height="50%" onClick={onZoom}/>
                     {/* 더 보기 버튼 */}
                     <div style={{ display: 'inline-block', width: '50%', textAlign: 'center', verticalAlign: 'middle' }} >
                         <PlusOutlined />

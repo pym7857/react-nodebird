@@ -6,7 +6,19 @@ const router = express.Router();
 /* 페이지 새로 불러올때마다, 게시글들도 같이 가져와야된다. */
 router.get('/', async (req, res, next) => {
     try {
+        // 분기처리 
+        let where = {};
+        if (parseInt(req.query.lastId, 10)) {       // lastId가 0이 아니라면(0은 false)
+            where = {
+                id: {
+                    [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10),   // sequelize operator사용. 
+                                                                            // lt = less than
+                },
+            };
+        }
+        // lastId가 0 이라면, where = {}. 즉, 처음게시글부터 다 가져오게 된다. 
         const posts = await db.Post.findAll({
+            where,
             /* include: 게시글 불러올때 user정보와 image정보도 같이 불러온다. */
             include: [
             {
@@ -37,6 +49,7 @@ router.get('/', async (req, res, next) => {
             }],
             order: [['createdAt', 'DESC']], // 가장 최신 게시글들을 맨 위로 가져오기
                                             // order가 2차원 배열인 이유는 조건을 여러개 줄 수 도 있기 때문 !! (ex. updatedAt등을 2순위로 추가 가능)
+            limit: parseInt(req.query.limit, 10),                                
         });
         res.json(posts);
     } catch (e) {

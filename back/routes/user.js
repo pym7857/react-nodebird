@@ -152,14 +152,17 @@ router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
 });
 
 /* 내가 팔로잉 하고있는 사람들 목록 가져오기 라우터 */
-router.get('/:id/followings', isLoggedIn, async (req, res, next) => { // /api/user/:id/followings
+router.get('/:id/followings', isLoggedIn, async (req, res, next) => { 
   try {
     const user = await db.User.findOne({
       where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
     });
     const myFollowings = await user.getFollowings({   // get() - sequelize에서 제공 
       attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
+      offset: parseInt(req.query.offset, 10),
+      limit: parseInt(req.query.limit, 10),
     });
+    console.log('오프셋=', req.query.offset);
     res.json(myFollowings);
   } catch (e) {
     console.error(e);
@@ -168,13 +171,15 @@ router.get('/:id/followings', isLoggedIn, async (req, res, next) => { // /api/us
 });
 
 /* 내 팔로워들 목록 가져오기 라우터 */
-router.get('/:id/followers', isLoggedIn, async (req, res, next) => { // /api/user/:id/followers
+router.get('/:id/followers', isLoggedIn, async (req, res, next) => { 
   try {
     const user = await db.User.findOne({
       where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
     });
     const myFollowers = await user.getFollowers({     // get() - sequelize에서 제공 
       attributes: ['id', 'nickname'],                 // password 제거하기 위해 옵션을 준다. 
+      offset: parseInt(req.query.offset, 10),
+      limit: parseInt(req.query.limit, 10),
     });
     res.json(myFollowers);
   } catch (e) {
