@@ -1,14 +1,49 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Slick from 'react-slick';
-import { CloseOutlined } from '@ant-design/icons';
+import { Overlay, Header, CloseBtn, SlickWrapper, ImgWrapper, Indicator } from './style';
 
 const ImagesZoom = ({ images, onClose }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
-
     const backURL = 'http://localhost:3067';
 
     return (
+        <Overlay>
+            <Header>
+                <h1>상세 이미지</h1>
+                <CloseBtn onClick={onClose}/>
+            </Header>
+            <SlickWrapper>
+                <div>
+                    {/* 이미지 슬라이드 */}
+                    <Slick
+                        initialSlide={0}
+                        afterChange={slide => setCurrentSlide(slide)}
+                        infinite={false}
+                        arrows
+                        slidesToShow={1}
+                        slidesToScroll={1}
+                    >
+                        {images.map((v) => {
+                            return (
+                                <ImgWrapper>
+                                    <img src={ `${backURL}/${v.src}` } />
+                                </ImgWrapper>
+                            );
+                        })}
+                    </Slick>
+                    {/* 몇번째 슬라이드 인지 */}
+                    <Indicator>
+                        <div>
+                            {currentSlide + 1} / {images.length}
+                        </div>
+                    </Indicator>
+                </div>
+            </SlickWrapper>
+        </Overlay>
+    )
+
+    /* return (
         <div style={{ position: 'fixed', zIndex: 5000, top: 0, left: 0, right: 0, bottom: 0 }}>
             <header style={{ height: 44, background: 'white', position: 'relative', padding: 0, textAlign: 'center'}}>
                 <h1 style={{ margin: 0, fontSize: '17px', color: '#333', lineHeight: '44px' }}>상세 이미지</h1>
@@ -16,7 +51,6 @@ const ImagesZoom = ({ images, onClose }) => {
             </header>
             <div style={{ height: 'calc(100% - 44px)', background: '#090909' }}>
                 <div>
-                    {/* 이미지 슬라이드 */}
                     <Slick
                         initialSlide={0}
                         afterChange={slide => setCurrentSlide(slide)}
@@ -33,7 +67,6 @@ const ImagesZoom = ({ images, onClose }) => {
                             );
                         })}
                     </Slick>
-                    {/* 몇번째 슬라이드 인지 */}
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ width: 75, height: 30, lineHeight: '30px', borderRadius: 15, background: '#313131', display: 'inline-block', textAlign: 'center', color: 'white', fontSize: '15px' }}>
                             {currentSlide + 1} / {images.length}
@@ -42,7 +75,7 @@ const ImagesZoom = ({ images, onClose }) => {
                 </div>
             </div>
         </div>
-    )
+    ) */
 };
 
 ImagesZoom.propTypes = {

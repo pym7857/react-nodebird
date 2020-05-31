@@ -260,6 +260,8 @@ const reducer = (state = initialState, action) => {
             }; */
         }
         case LOAD_FOLLOWERS_REQUEST: {
+            draft.followerList = !action.offset ? [] : draft.followerList;      // offset이 없는 경우, followerList = []
+                                                                                // 이렇게 해줘야 2번씩 로딩 안됨 
             break;
             /* return {
               ...state,
@@ -288,6 +290,8 @@ const reducer = (state = initialState, action) => {
             }; */
         }
         case LOAD_FOLLOWINGS_REQUEST: {
+            draft.followingList = !action.offset ? [] : draft.followingList;      // offset이 없는 경우, followerList = []
+                                                                                  // 이렇게 해줘야 2번씩 로딩 안됨 
             break;
             /* return {
               ...state,

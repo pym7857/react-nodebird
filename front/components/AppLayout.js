@@ -3,15 +3,22 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Menu, Input, Button, Row, Col } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
+import Router from 'next/router';
 
-import LoginForm from './LoginForm';
-import UserProfile from './UserProfile';
+import LoginForm from '../containers/LoginForm';
+import UserProfile from '../containers/UserProfile';
 import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const AppLayout = ({ children }) => {
 
   const { me } = useSelector(state => state.user);
   const dispatch = useDispatch();
+
+  const onSearch = (value) => {
+    /* 프론트에서의 동적 라우팅 */
+    Router.push({ pathname: '/hashtag', query: { tag: value } }, `hashtag/${value}`);   // 내부적으로는 pathname: '/hashtag', query: { tag: value } } 로 접근
+                                                                                        // 외부적으로는 `hashtag/${value}`로 보인다.
+  };
 
   /* useEffect(() => {
     if (!me) {  // 내 정보 없다면 
@@ -28,7 +35,11 @@ const AppLayout = ({ children }) => {
         <Menu.Item key="home"><Link href="/"><a>노드버드</a></Link></Menu.Item>
         <Menu.Item key="profile"><Link href="/profile"><a>프로필</a></Link></Menu.Item>
         <Menu.Item key="mail">
-          <Input.Search enterButton style={{ verticalAlign: 'middle' }}/>
+          <Input.Search 
+            enterButton 
+            style={{ verticalAlign: 'middle' }}
+            onSearch={onSearch}
+          />
         </Menu.Item>
       </Menu>
       {!me && <Link href="/signup"><a><Button>회원가입</Button></a></Link>}

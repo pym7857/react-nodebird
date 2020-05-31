@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LOAD_HASHTAG_POSTS_REQUEST } from '../reducers/post';
-import PostCard from '../components/PostCard';
+import PostCard from '../containers/PostCard';
 
 const Hashtag = ({ tag }) => {
     const dispatch = useDispatch();
@@ -63,8 +63,11 @@ Hashtag.propTypes = {
 }; */
 
 Hashtag.getInitialProps = async (context) => {
-    const tag = context.query.tag;
-    console.log('tag=', tag);
+    //const tag = context.query.tag;                   // query: { tag: '가위바위보' }
+    //console.log('tag=', tag);
+
+    const { tag } = context.query;
+    console.log('hashtag getInitialProps에서..=', tag);
 
     context.store.dispatch({
         type: LOAD_HASHTAG_POSTS_REQUEST,     // 해당 해시태그 게시글들 가져오기 요청 

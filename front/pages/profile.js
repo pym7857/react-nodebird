@@ -10,8 +10,8 @@ import {
     UNFOLLOW_USER_REQUEST,
 } from '../reducers/user';
 import { LOAD_USER_POSTS_REQUEST } from '../reducers/post';
-import PostCard from '../components/PostCard';
-import NicknameEditForm from '../components/NicknameEditForm';
+import PostCard from '../containers/PostCard';
+import NicknameEditForm from '../containers/NicknameEditForm';
 
 const Profile = () => {
     const dispatch = useDispatch();

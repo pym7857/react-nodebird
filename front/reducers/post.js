@@ -16,6 +16,7 @@ export const initialState = {
     addLikeErrorReason: '',
 
     hasMorePost: false,         // 스크롤을 더 내려야 할지 
+    singlePost: null,
 };
 
 /* Action의 이름 */
@@ -65,6 +66,10 @@ export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';           // 게시글 한개 불러오기 
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
+
 /* 실제 Action */
 // ...
 
@@ -107,7 +112,7 @@ const reducer = (state = initialState, action) => {
         case LOAD_MAIN_POSTS_REQUEST: 
         case LOAD_HASHTAG_POSTS_REQUEST:
         case LOAD_USER_POSTS_REQUEST: {
-            draft.mainPosts = action.lastId === 0 ? [] : draft.mainPosts;
+            draft.mainPosts = !action.lastId ? [] : draft.mainPosts;      // lastId가 없으면, mainPosts = []
             draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
             break;
             /* return {
@@ -325,6 +330,10 @@ const reducer = (state = initialState, action) => {
             /* return {
               ...state,
             }; */
+        }
+        case LOAD_POST_SUCCESS: {
+          draft.singlePost = action.data;
+          break;
         }
         default: {
             break;

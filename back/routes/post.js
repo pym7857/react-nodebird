@@ -186,7 +186,7 @@ router.post('/:id/like', isLoggedIn, async (req, res, next) => {
             return res.status(403).send('본인 게시글에는 좋아요 할 수 없습니다.');
         }
 
-        await post.addLiker(req.user.id);   // post.Likers로 프론트에서 사용 가능 
+        await post.addLiker(req.user.id);  
         res.json({ userId: req.user.id });
     } catch (e) {
         console.error(e);
@@ -277,6 +277,7 @@ router.post('/:id/retweet', isLoggedIn, async (req, res, next) => {
     }
 });
 
+/* 게시글 삭제 라우터 */
 router.delete('/:id', isLoggedIn, async (req, res, next) => {
     try {
         /* 항상, 게시글이 먼저 있는지 확인 */
@@ -289,6 +290,25 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
     } catch (e) {
         console.error(e);
         next(e);
+    }
+});
+
+/* 게시글 한개 가져오기 라우터 */
+router.get('/:id', async (req, res, next) => {
+    try {
+      const post = await db.Post.findOne({
+        where: { id: req.params.id },
+        include: [{
+          model: db.User,
+          attributes: ['id', 'nickname'],
+        }, {
+          model: db.Image,
+        }],
+      });
+      res.json(post);
+    } catch (e) {
+      console.error(e);
+      next(e);
     }
 });
 

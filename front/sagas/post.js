@@ -33,7 +33,10 @@ import {
     RETWEET_SUCCESS,
     REMOVE_POST_FAILURE,
     REMOVE_POST_REQUEST,
-    REMOVE_POST_SUCCESS
+    REMOVE_POST_SUCCESS,
+    LOAD_POST_FAILURE, 
+    LOAD_POST_SUCCESS,
+    LOAD_POST_REQUEST,
 } from '../reducers/post';
 import { ADD_POST_TO_ME } from '../reducers/user';
 
@@ -134,7 +137,7 @@ function* watchAddComment() {
  * 특정 해시태그에 해당하는 게시글 가져오기 3종세트
  */
 function loadHashtagPostsAPI(tag, lastId=0, limit=10) {
-    return axios.get(`/hashtag/${encodeURIComponent(tag)}?lastId=${lastId}&limit={limit}`);
+    return axios.get(`/hashtag/${encodeURIComponent(tag)}?lastId=${lastId}&limit=${limit}`);
 }
 function* loadHashtagPosts(action) {
     try {
@@ -296,7 +299,7 @@ function* watchUnlikePost() {
 }
 
 /**
- * 리트윗 3종세트
+ * 리트윗 하기 3종세트
  */
 function retweetAPI(postId) {
   return axios.post(`/post/${postId}/retweet`, {}, {    // post 요청 시에는 data가 없더라도 빈 객체 {} 라도 넣어줘야 한다. 
@@ -355,6 +358,31 @@ function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
 
+/**
+ * 게시글 한개 불러오기 3종세트
+ */
+function loadPostAPI(postId) {
+  return axios.get(`/post/${postId}`);
+}
+function* loadPost(action) {
+  try {
+    const result = yield call(loadPostAPI, action.data);
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: LOAD_POST_FAILURE,
+      error: e,
+    });
+  }
+}
+function* watchLoadPost() {
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
+
 /* ㅡㅡㅡㅡㅡ main ㅡㅡㅡㅡㅡ*/
 function* postSaga() {
     yield all([
@@ -369,6 +397,7 @@ function* postSaga() {
         fork(watchUnlikePost),
         fork(watchRetweet),
         fork(watchRemovePost),
+        fork(watchLoadPost),
     ]);
 }
 export default postSaga;

@@ -17,7 +17,7 @@ router.get('/:tag', async (req, res, next) => {
         }
         const posts = await db.Post.findAll({
             where,
-            /* include: 게시글 불러올때, 해당 해시태그, user정보, image정보 같이 불러온다. */
+            // include: 게시글 불러올때, 해당 해시태그, user정보, image정보 같이 불러온다.
             include: [
             {
                 model: db.Hashtag,  // 게시글 가져올때 해시태그도 함께 가져오도록.

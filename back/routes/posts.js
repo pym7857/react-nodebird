@@ -8,7 +8,7 @@ router.get('/', async (req, res, next) => {
     try {
         // 분기처리 
         let where = {};
-        if (parseInt(req.query.lastId, 10)) {       // lastId가 0이 아니라면(0은 false)
+        if (parseInt(req.query.lastId, 10)) {       // lastId가 0이 아니라면(=0은 false)
             where = {
                 id: {
                     [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10),   // sequelize operator사용. 
