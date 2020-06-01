@@ -19,8 +19,8 @@ export const initialState = {
     signUpErrorReason: '',        // 회원가입 에러 사유
 
     me: null,                     // 내 정보
-    followingList: [],            // 내가 팔로잉 하고있는 사람들 목록 (프로필 페이지 에서만 쓰임)(다른곳에서 import 하지 X)
-    followerList: [],             // 나의 팔로워들 목록              (프로필 페이지 에서만 쓰임)(다른곳에서 import 하지 X)
+    followingList: [],            // '내'가 팔로잉 하고있는 사람들 목록 (프로필 페이지에서 쓰임)
+    followerList: [],             // '나'의 팔로워들 목록              (프로필 페이지에서 쓰임)
     userInfo: null,               // 남의 정보 
 
     isEditingNickname: false,     // 닉네임 변경 중 
@@ -228,21 +228,17 @@ const reducer = (state = initialState, action) => {
             }; */
         }
         case UNFOLLOW_USER_SUCCESS: {
-            const userIndex1 = draft.me.Followings.findIndex(v => v.id === action.data);
-            draft.me.Followings.splice(userIndex1, 1);
-            const userIndex2 = draft.me.FollowingList.findIndex(v => v.id === action.data);
-            draft.followingList.splice(userIndex2, 1);
+            // me.Followings 배열 안에 상대방 id가 들었는지 찾기 
+            const index = draft.me.Followings.findIndex(v => v.id === action.data);
+            draft.me.Followings.splice(index, 1);
+
+            // followingList 배열 안에 상대방 id가 들었는지 찾기 (me.FollowingList가 아니다!!!!!!!!!!!)
+            const index2 = draft.followingList.findIndex(v => v.id === action.data);
+            draft.followingList.splice(index2, 1);
             break;
-            /* return {
-              ...state,
-              me: {
-                ...state.me,
-                Followings: state.me.Followings.filter(v => v.id !== action.data),
-              },
-              followingList: state.followingList.filter(v => v.id !== action.data),
-            }; */
         }
         case UNFOLLOW_USER_FAILURE: { 
+            console.log('action.error=', action.error);
             break;
             /* return {
               ...state,
@@ -289,16 +285,11 @@ const reducer = (state = initialState, action) => {
               ...state,
             }; */
         }
+        /* 프로필 페이지에서 팔로잉 목록 불러오는 명령 */
         case LOAD_FOLLOWINGS_REQUEST: {
             draft.followingList = !action.offset ? [] : draft.followingList;      // offset이 없는 경우, followerList = []
                                                                                   // 이렇게 해줘야 2번씩 로딩 안됨 
             break;
-            /* return {
-              ...state,
-              //hasMoreFollowing: action.offset ? state.hasMoreFollowing : true,  // 처음화면 일때는, offset은 0 이므로, false취급을 받아서 true로 넘어간다.(=더보기 버튼을 보여준다.)                                                         
-                                                                                  // (처음화면일때 offset이 0인것은, router.get('/:id/followings'... 에서 확인가능) 
-                                                                                  // 여기 없어도 됨 (내 Q&A 답글)      
-            }; */
         }
         case LOAD_FOLLOWINGS_SUCCESS: {
             action.data.forEach((f) => {
@@ -306,12 +297,6 @@ const reducer = (state = initialState, action) => {
             });
             draft.hasMoreFollowing = action.data.length === 3;
             break;
-            /* return {
-              ...state,
-              followingList: state.followingList.concat(action.data),   // 기존것을 덮어쓰지 말고, 기존것에 추가
-              hasMoreFollowing: action.data.length === 3,               // 방금 로드된 팔로워가 1명 또는 2명이라면, 더보기 버튼을 보여줄 필요가 없다.
-                                                                        // 방금 로드된 팔로워가 3명일때만(=limit은 3이었음), 더보기 버튼을 보여줄 필요가 있다. 
-            }; */
         }
         case LOAD_FOLLOWINGS_FAILURE: {
             break;
@@ -328,17 +313,11 @@ const reducer = (state = initialState, action) => {
         case REMOVE_FOLLOWER_SUCCESS: {
             const userIndex1 = draft.Followers.findIndex(v => v.id === action.data);
             draft.me.Followers.splice(userIndex1, 1);
+
+            // me.followerList가 아니다!!!!!!!!!!!!!!!!!! 
             const userIndex2 = draft.followerList.findIndex(v => v.id === action.data);
-            draft.me.followerList.splice(userIndex2, 1);
+            draft.followerList.splice(userIndex2, 1); 
             break;
-            /* return {
-              ...state,
-              me: {
-                ...state.me,
-                Followers: state.me.Followers.filter(v => v.id !== action.data),
-              },
-              followerList: state.followerList.filter(v => v.id !== action.data),
-            }; */
         }
         case REMOVE_FOLLOWER_FAILURE: {
             break;

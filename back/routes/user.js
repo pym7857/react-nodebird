@@ -132,6 +132,7 @@ router.post('/:id/follow', isLoggedIn, async (req, res, next) => {
     });
     // 내 팔로윙 리스트에 상대방 아이디 추가 
     await me.addFollowing(req.params.id);   // add(): 시퀄라이즈에서 알아서 연결해줌 
+                                            // 나중에 include설정시, Followings로 가져올 수 있음(=get)
     res.send(req.params.id);
   } catch (e) {
     console.error(e);
@@ -148,7 +149,7 @@ router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
     await me.removeFollowing(req.params.id);   // remove(): 시퀄라이즈에서 알아서 삭제해줌  
     res.send(req.params.id);
   } catch (e) {
-    console.error(e);
+    console.error('언팔 라우터 catch 에러=', e);
     next(e);
   }
 });
