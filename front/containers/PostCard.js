@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import { 
   ADD_COMMENT_REQUEST, 
@@ -17,6 +18,8 @@ import {
 import { FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST } from '../reducers/user';
 import PostImages from '../components/PostImages';
 import PostCardContent from '../components/PostCardContent';
+
+moment.locale('ko');    // moment에 한글 설정 
 
 const CardWrapper = styled.div`
   margin-bottom: 20px;
@@ -162,6 +165,7 @@ const PostCard = ({ post }) => {
             <Card
               cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}
             >
+              <span style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD.')}</span>
               <Card.Meta
                 avatar={(
                   <Link
@@ -176,16 +180,19 @@ const PostCard = ({ post }) => {
             </Card>
           )
           : (
-          <Card.Meta
-            avatar={(
-              <Link href={{ pathname: '/user', query: { id: post.User.id } }}>
-                <a><Avatar>{post.User.nickname[0]}</Avatar></a>
-              </Link>
-            )}
-            title={post.User.nickname}
-            description={<PostCardContent postData={post.content}/>}
-          />
-      )}
+            <>
+              <span style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD.')}</span>
+              <Card.Meta
+                avatar={(
+                  <Link href={{ pathname: '/user', query: { id: post.User.id } }}>
+                    <a><Avatar>{post.User.nickname[0]}</Avatar></a>
+                  </Link>
+                )}
+                title={post.User.nickname}
+                description={<PostCardContent postData={post.content}/>}
+              />
+            </>
+          )}
       </Card>
 
       {commentFormOpened && (
