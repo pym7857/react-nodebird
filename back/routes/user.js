@@ -126,9 +126,11 @@ router.post('/login', (req, res, next) => {
 /* 팔로우 하기 라우터 */
 router.post('/:id/follow', isLoggedIn, async (req, res, next) => {
   try {
+    // 나 자신의 객체(me)를 찾고,
     const me = await db.User.findOne({
       where: { id: req.user.id },
     });
+    // 내 팔로윙 리스트에 상대방 아이디 추가 
     await me.addFollowing(req.params.id);   // add(): 시퀄라이즈에서 알아서 연결해줌 
     res.send(req.params.id);
   } catch (e) {

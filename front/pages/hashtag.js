@@ -20,7 +20,7 @@ const Hashtag = ({ tag }) => {
           if (hasMorePost) {
             dispatch({
               type: LOAD_HASHTAG_POSTS_REQUEST,
-              lastId: mainPosts[mainPosts.length -1].id,    // 마지막 게시글의 id를 가져옴 
+              lastId: mainPosts[mainPosts.length -1] && mainPosts[mainPosts.length -1].id,    // 마지막 게시글의 id를 가져옴 
               data: tag,
             });
           }

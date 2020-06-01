@@ -19,8 +19,8 @@ export const initialState = {
     signUpErrorReason: '',        // 회원가입 에러 사유
 
     me: null,                     // 내 정보
-    followingList: [],
-    followerList: [],              
+    followingList: [],            // 내가 팔로잉 하고있는 사람들 목록 (프로필 페이지 에서만 쓰임)(다른곳에서 import 하지 X)
+    followerList: [],             // 나의 팔로워들 목록              (프로필 페이지 에서만 쓰임)(다른곳에서 import 하지 X)
     userInfo: null,               // 남의 정보 
 
     isEditingNickname: false,     // 닉네임 변경 중 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import { RetweetOutlined, HeartOutlined, HeartTwoTone, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Card, Button, Avatar, Form, Input, List, Comment, Popover } from 'antd';
 import Link from 'next/link';
@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import { 
-  ADD_COMMENT_REQUEST, 
   LOAD_COMMENTS_REQUEST, 
   UNLIKE_POST_REQUEST, 
   LIKE_POST_REQUEST, 
@@ -18,6 +17,7 @@ import {
 import { FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST } from '../reducers/user';
 import PostImages from '../components/PostImages';
 import PostCardContent from '../components/PostCardContent';
+import CommentForm from './CommentForm';
 
 moment.locale('ko');    // moment에 한글 설정 
 
@@ -25,13 +25,10 @@ const CardWrapper = styled.div`
   margin-bottom: 20px;
 `; 
 
-const PostCard = ({ post }) => {
+const PostCard = memo( ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
-  const [commentText, setCommentText] = useState('');
   const { me } = useSelector(state => state.user);
-  const { commentAdded, isAddingComment } = useSelector(state => state.post);
   const dispatch = useDispatch();
-
   const isLiked = me && post.Likers && post.Likers.find(v => v.id === me.id); // 내가 '좋아요' 했었는지 
 
   /* onClick 했을때, 댓글창 열고닫기 */
@@ -48,31 +45,6 @@ const PostCard = ({ post }) => {
       });
     }
   }, [commentFormOpened]);
-
-  /* 댓글 업로드 */
-  const onSubmitComment = useCallback((e) => {
-    e.preventDefault();
-    if (!me) {
-      return alert('댓글을 작성하려면, 로그인이 필요합니다.');
-    }
-    return dispatch({
-      type: ADD_COMMENT_REQUEST,
-      data: {
-        postId: post.id,
-        content: commentText,
-      },
-    });
-  }, [me && me.id, commentText]);
-
-  /* 댓글 작성 완료되면, 댓글 입력창 비워주기 */
-  useEffect(() => {
-    setCommentText('');
-  }, [commentAdded === true]); 
-
-  /* 댓글이 작성되는 중에 */
-  const onChangeCommentText = useCallback((e) => {
-    setCommentText(e.target.value);
-  }, []);
 
   /* onClick 했을때, '좋아요' 처리 */
   const onToggleLike = useCallback(() => {
@@ -103,13 +75,16 @@ const PostCard = ({ post }) => {
     });
   }, [me && me.id, post.id]);
 
+  /* 팔로우 하기 눌렀을때 */
   const onFollow = useCallback(userId => () => {
+    //console.log(me.id, userId);   // 12, 1
     dispatch({
       type: FOLLOW_USER_REQUEST,
       data: userId,
     });
   }, []);
 
+  /* 언팔로우 하기 눌렀을때 */
   const onUnfollow = useCallback(userId => () => {
     dispatch({
       type: UNFOLLOW_USER_REQUEST,
@@ -197,12 +172,7 @@ const PostCard = ({ post }) => {
 
       {commentFormOpened && (
         <>
-          <Form onSubmit={onSubmitComment}>
-            <Form.Item>
-              <Input.TextArea rows={4} value={commentText} onChange={onChangeCommentText} />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" loading={isAddingComment}>삐약</Button>
-          </Form>
+          <CommentForm post={post}/>
           <List
             header={`${post.Comments ? post.Comments.length : 0} 댓글`}
             itemLayout="horizontal"
@@ -221,7 +191,7 @@ const PostCard = ({ post }) => {
       )}
     </CardWrapper>
   );
-};
+});
 
 PostCard.propTypes = {
     post: PropTypes.shape({
