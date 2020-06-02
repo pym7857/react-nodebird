@@ -107,7 +107,7 @@ const reducer = (state = initialState, action) => {
         }
         case LOG_IN_FAILURE: {
             draft.isLoggingIn = false;
-            draft.logInErrorReason = action.error;
+            draft.logInErrorReason = action.reason;   // saga에서 보낸 action.reason
             draft.me = null;
             break;
             /* return {

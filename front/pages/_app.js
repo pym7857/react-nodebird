@@ -17,6 +17,9 @@ import { LOAD_USER_REQUEST } from '../reducers/user';
                                     // rootReducer인데 reducer이름으로 가져옴 (가져오는 이름은 이처럼 맘대로 가능)
 
 const NodeBird = ({ Component, store, pageProps }) => {
+
+    const frontURL = 'http://localhost:3062'
+
     return (
         <Container>
             <Provider store={store}>
@@ -38,6 +41,8 @@ const NodeBird = ({ Component, store, pageProps }) => {
                         name: 'og:description', content: 'NodeBird SNS',
                     }, {
                         property: 'og:type', content: 'website',
+                    }, {
+                        property: 'og:image', content: `${frontURL}/favicon.ico`,
                     }]}
                     link={[{
                         rel: 'shortcut icon', href: '/linux.ico',

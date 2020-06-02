@@ -18,6 +18,7 @@ import { FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST } from '../reducers/user';
 import PostImages from '../components/PostImages';
 import PostCardContent from '../components/PostCardContent';
 import CommentForm from './CommentForm';
+import FollowButton from '../components/FollowButton';
 
 moment.locale('ko');    // moment에 한글 설정 
 
@@ -27,9 +28,9 @@ const CardWrapper = styled.div`
 
 const PostCard = memo( ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
-  const { me } = useSelector(state => state.user);
+  const myId = useSelector(state => state.user.me && state.user.me.id);
   const dispatch = useDispatch();
-  const isLiked = me && post.Likers && post.Likers.find(v => v.id === me.id); // 내가 '좋아요' 했었는지 
+  const isLiked = myId && post.Likers && post.Likers.find(v => v.id === myId); // 내가 '좋아요' 했었는지 
 
   /* onClick 했을때, 댓글창 열고닫기 */
   const onToggleComment = useCallback(() => {
@@ -48,7 +49,7 @@ const PostCard = memo( ({ post }) => {
 
   /* onClick 했을때, '좋아요' 처리 */
   const onToggleLike = useCallback(() => {
-    if (!me) {
+    if (!myId) {
       return alert('로그인이 필요합니다.');    // 로그인 안된 사용자는 '좋아요' 클릭 불가
     }
     if (isLiked) {   // 내가 '좋아요' 이미 누른 상태이면   
@@ -63,17 +64,17 @@ const PostCard = memo( ({ post }) => {
           
       });
     }
-  }, [me && me.id, post && post.id, isLiked]);
+  }, [myId, post && post.id, isLiked]);
 
   const onRetweet = useCallback(() => {
-    if (!me) {
+    if (!myId) {
       return alert('로그인이 필요합니다.');
     }
     return dispatch({
       type: RETWEET_REQUEST,
       data: post.id,
     });
-  }, [me && me.id, post.id]);
+  }, [myId, post.id]);
 
   /* 팔로우 하기 눌렀을때 */
   const onFollow = useCallback(userId => () => {
@@ -111,7 +112,7 @@ const PostCard = memo( ({ post }) => {
               key="ellipsis"
               content={(
                 <Button.Group>
-                  {me && post.UserId === me.id
+                  {myId && post.UserId === myId
                     ? (
                       <>
                         <Button>수정</Button>
@@ -126,13 +127,7 @@ const PostCard = memo( ({ post }) => {
             </Popover>,
         ]}
         title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다.` : null}
-        extra={
-          !me || post.User.id === me.id
-          ? null
-          : me.Followings && me.Followings.find(v => v.id === post.User.id)
-            ? <Button onClick={onUnfollow(post.User.id)}>언팔로우</Button>
-            : <Button onClick={onFollow(post.User.id)}>팔로우</Button>
-        }
+        extra={<FollowButton post={post} onUnfollow={onUnfollow} onFollow={onFollow} />}
       >
         {/* 리트윗 한 경우에는 Card 안에 Card를 하나 더 만들어 준다. */}
         {post.RetweetId && post.Retweet 

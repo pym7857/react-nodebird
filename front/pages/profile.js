@@ -1,6 +1,4 @@
 import React, { useCallback } from 'react';
-import { Button, List, Card } from 'antd';
-import { StopOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -12,6 +10,7 @@ import {
 import { LOAD_USER_POSTS_REQUEST } from '../reducers/post';
 import PostCard from '../containers/PostCard';
 import NicknameEditForm from '../containers/NicknameEditForm';
+import FollowList from '../components/FollowList';
 
 const Profile = () => {
     const dispatch = useDispatch();
@@ -71,39 +70,21 @@ const Profile = () => {
             <NicknameEditForm />
 
             {/* 팔로잉 목록 */}
-            <List 
-                style={{ marginBottom: '20px' }}
-                grid={{ gutter: 4, xs: 2, md: 3 }}
-                size="small"
-                header={<div>팔로잉 목록</div>}
-                loadMore={hasMoreFollowing && <Button style={{ width: '100%' }} onClick={loadMoreFollowings}>더 보기</Button>}
-                bordered
-                dataSource={followingList}
-                renderItem={item => (
-                    <List.Item style={{ maringTop: '20px' }}>
-                        <Card actions={[<StopOutlined key="stop" onClick={onUnfollow(item.id)}/>]}>
-                            <Card.Meta description={item.nickname} />
-                        </Card>
-                    </List.Item>
-                )}
+            <FollowList 
+                header="팔로잉 목록"
+                hasMore={hasMoreFollowing}
+                onClickMore={loadMoreFollowings}
+                data={followingList}
+                onClickStop={onUnfollow}
             />
 
             {/* 팔로워 목록 */}
-            <List 
-                style={{ marginBottom: '20px' }}
-                grid={{ gutter: 4, xs: 2, md: 3 }}
-                size="small"
-                header={<div>팔로워 목록</div>}
-                loadMore={hasMoreFollower &&<Button style={{ width: '100%' }} onClick={loadMoreFollowers}>더 보기</Button>}
-                bordered
-                dataSource={followerList}
-                renderItem={item => (
-                    <List.Item style={{ maringTop: '20px' }}>
-                        <Card actions={[<StopOutlined key="stop" onClick={onRemoveFollower(item.id)}/>]}>
-                            <Card.Meta description={item.nickname} />
-                        </Card>
-                    </List.Item>
-                )}
+            <FollowList 
+                header="팔로워 목록"
+                hasMore={hasMoreFollower}
+                onClickMore={loadMoreFollowers}
+                data={followerList}
+                onClickStop={onRemoveFollower}
             />
 
             {/* '내가 쓴' 게시글 목록 */}

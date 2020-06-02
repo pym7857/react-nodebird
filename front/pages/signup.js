@@ -2,8 +2,13 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Form, Input, Checkbox, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
+import styled from 'styled-components';
 
 import { SIGN_UP_REQUEST } from '../reducers/user';
+
+const SignUpErrorMsg = styled.div`
+    color: red;
+`;
 
 // 중복되는 로직의 이벤트 처리 -> 커스텀 훅
 // export해놓으면 다른곳에서 모듈처럼 사용가능 !
@@ -91,13 +96,13 @@ const Signup = () => {
                     <label htmlFor="user-password-check">비밀번호 확인</label>
                     <br />
                     <Input name="user-password-check" type="password" value={passwordCheck} required onChange={onChangePasswordCheck} />
-                    {passwordError && <div style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</div>}
+                    {passwordError && <SignUpErrorMsg>비밀번호가 일치하지 않습니다.</SignUpErrorMsg>}
                 </div>
                 <div>
                     <Checkbox name="user-term" checked={term} onChange={onChangeTerm}>
                         OOO 약관에 동의합니다.
                     </Checkbox>
-                    {termError && <div style={{ color: 'red' }}>약관에 동의하셔야 합니다.</div>}
+                    {termError && <SignUpErrorMsg>약관에 동의하셔야 합니다.</SignUpErrorMsg>}
                 </div>
                 <div style={{ maringTop: 10 }}>
                     <Button type="primary" htmlType="submit" loading={isSigningUp}>가입하기</Button>

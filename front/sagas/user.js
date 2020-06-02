@@ -50,8 +50,11 @@ function* login(action) {
         });
     } catch (e) {
         console.error(e);
+        console.dir(e); // 이렇게 하면 에러객체(e)가 콘솔창에 로깅이 된다.
+                          //    -> e.response.data에 "사유" 들어있다. 
         yield put({
             type: LOG_IN_FAILURE,
+            reason: e.response && e.response.data,
         });
     }
 }
@@ -204,6 +207,15 @@ function* watchUnfollow() {
 /**
  * 내 팔로워들 목록 가져오기 3종세트
  */
+/**
+ * (Profile.getInitialProps): 프로필 페이지 첫 로딩할때를 생각해보자.
+ *   - LOAD_USER_SUCCESS되서 me생기는 부분이 dispatch보다 아래에 있었음.
+ *   - 따라서 dispatch에서 전해주는, data부분이 null인 경우, 자기 자신으로 간주합니다.(=꼼수) 
+ *      -> 여기서 ${userId || 0}:  userId가 null이라면, 0을 전달하겠다. 
+ *      -> 이게 routes로 건너가서 req.params.id 부분이 첫 프로필 로딩때는 0일테니 false로 간주된다.
+ *      -> where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
+ *      -> 그렇게 되면, 자동적으로 || 뒤에있는 (req.user && req.user.id)가 where절에 들어가게 된다.
+ */
 function loadFollowersAPI(userId, offset = 0, limit = 3) {  // 기본값 설정 
   // 서버에 요청을 보내는 부분
   return axios.get(`/user/${userId || 0}/followers?offset=${offset}&limit=${limit}`, {
@@ -232,6 +244,15 @@ function* watchLoadFollowers() {
 
 /**
  * 내가 팔로잉 하고있는 사람들 목록 가져오기 3종세트
+ */
+/**
+ * (Profile.getInitialProps): 프로필 페이지 첫 로딩할때를 생각해보자.
+ *   - LOAD_USER_SUCCESS되서 me생기는 부분이 dispatch보다 아래에 있었음.
+ *   - 따라서 dispatch에서 전해주는, data부분이 null인 경우, 자기 자신으로 간주합니다.(=꼼수) 
+ *      -> 여기서 ${userId || 0}:  userId가 null이라면, 0을 전달하겠다. 
+ *      -> 이게 routes로 건너가서 req.params.id 부분이 첫 프로필 로딩때는 0일테니 false로 간주된다.
+ *      -> where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0},
+ *      -> 그렇게 되면, 자동적으로 || 뒤에있는 (req.user && req.user.id)가 where절에 들어가게 된다.
  */
 function loadFollowingsAPI(userId, offset = 0, limit = 3) {
   // 서버에 요청을 보내는 부분

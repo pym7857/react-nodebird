@@ -23,7 +23,7 @@ router.post('/', async (req, res, next) => {
             },
         });
         if (exUser) {
-            return res.status(403).send('실패 : 이미 사용중인 아이디입니다.');
+            return res.status(403).send('이미 사용중인 아이디입니다.');
         }
         const hashedPassword = await bcrypt.hash(req.body.password, 12); // 비밀번호 암호화(salt는 10~13)
         const newUser = await db.User.create({
@@ -154,7 +154,8 @@ router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
   }
 });
 
-/* 내가 팔로잉 하고있는 사람들 목록 가져오기 라우터 */
+/* '내'가 팔로잉 하고있는 사람들 목록 가져오기 라우터 */
+/* 여기 이해 안되면 Profile.getInitialProps 에서 했었던 꼼수 참조 */
 router.get('/:id/followings', isLoggedIn, async (req, res, next) => { 
   try {
     const user = await db.User.findOne({
@@ -173,7 +174,8 @@ router.get('/:id/followings', isLoggedIn, async (req, res, next) => {
   }
 });
 
-/* 내 팔로워들 목록 가져오기 라우터 */
+/* '내' 팔로워들 목록 가져오기 라우터 */
+/* 여기 이해 안되면 Profile.getInitialProps 에서 했었던 꼼수 참조 */
 router.get('/:id/followers', isLoggedIn, async (req, res, next) => { 
   try {
     const user = await db.User.findOne({
