@@ -1,50 +1,27 @@
 {
-  "devFiles": [],
+  "devFiles": [
+    "static/development/dll/dll_8ecc1891b6a89739495f.js"
+  ],
   "pages": {
     "/": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
     "/_app": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
     "/_error": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
     "/hashtag": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
     "/index": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
-    ],
-    "/post": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
-    ],
-    "/profile": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
-    ],
-    "/signup": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
-    ],
-    "/user": [
-      "static/runtime/webpack-a79426b5e11f0ba5879d.js",
-      "static/chunks/commons.2fc749b261659ad344f9.js",
-      "static/runtime/main-1335eefe8e29f0a3c2de.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ]
   }
 }

@@ -17,6 +17,7 @@ router.get('/', isLoggedIn, (req, res) => {
 /* 회원가입 */
 router.post('/', async (req, res, next) => {
     try {
+        /* 예외처리 */
         const exUser = await db.User.findOne({
             where: {
                 userId: req.body.userId,
@@ -30,6 +31,7 @@ router.post('/', async (req, res, next) => {
             nickname: req.body.nickname,
             userId: req.body.userId,
             password: hashedPassword,
+            color: req.body.color,
         });
         return res.json(newUser);
     } catch (e) {
@@ -113,9 +115,9 @@ router.post('/login', (req, res, next) => {
                 as: 'Followers',
                 attributes: ['id'], 
               }],
-              attributes: ['id', 'nickname', 'userId'], // password만 빼고 프론트로 보낸다. 
+              attributes: ['id', 'nickname', 'userId', 'color'], // password만 빼고 프론트로 보낸다. 
             });
-            return res.json(fullUser); // { "id":2,"nickname":"22","userId":"22","Posts":[],"Followings":[],"Followers" }
+            return res.json(fullUser);
           } catch (e) {
             next(e);
           }

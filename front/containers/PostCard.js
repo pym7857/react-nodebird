@@ -141,7 +141,7 @@ const PostCard = memo( ({ post }) => {
                   <Link
                     href={{ pathname: '/user', query: { id: post.Retweet.User.id } }}
                   >
-                    <a><Avatar>{post.Retweet.User.nickname[0]}</Avatar></a>
+                    <a><Avatar style={{ backgroundColor: post.Retweet.User.color || 'gray' }}>{post.Retweet.User.nickname[0]}</Avatar></a>
                   </Link>
                 )}
                 title={post.Retweet.User.nickname}
@@ -155,11 +155,15 @@ const PostCard = memo( ({ post }) => {
               <Card.Meta
                 avatar={(
                   <Link href={{ pathname: '/user', query: { id: post.User.id } }}>
-                    <a><Avatar>{post.User.nickname[0]}</Avatar></a>
+                    <a>
+                      <Avatar style={{ backgroundColor: post.User.color || 'gray' }}>
+                        {post.User.nickname[0]}         {/* 닉네임의 첫글자만 보여준다 */}
+                      </Avatar>
+                    </a>                   
                   </Link>
                 )}
                 title={post.User.nickname}
-                description={<PostCardContent postData={post.content}/>}
+                description={<pre><PostCardContent postData={post.content}/></pre>}
               />
             </>
           )}
@@ -176,7 +180,14 @@ const PostCard = memo( ({ post }) => {
               <li>
                 <Comment
                   author={item.User.nickname}
-                  avatar={<Link href={{ pathname: '/user', query: { id: item.User.id } }}><a><Avatar>{item.User.nickname[0]}</Avatar></a></Link>}
+                  avatar={
+                    <Link href={{ pathname: '/user', query: { id: item.User.id } }}>
+                      <a>
+                        <Avatar style={{ backgroundColor: item.User.color || 'gray' }}>
+                          {item.User.nickname[0]}
+                        </Avatar>
+                      </a>
+                    </Link>}
                   content={item.content}
                 />
               </li>

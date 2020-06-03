@@ -129,7 +129,7 @@ router.get('/:id/comments', async (req, res, next) => {
             order: [['createdAt', 'ASC']], 
             include: [{
                 model: db.User,     // 댓글 작성자 정보도 같이 가져오기 
-                attributes: ['id', 'nickname'],
+                attributes: ['id', 'nickname', 'color'],
             }],
         });
         res.json(comments);
@@ -163,7 +163,7 @@ router.post('/:id/comment', isLoggedIn, async (req, res, next) => {     // ex) P
             },
             include: [{
                 model: db.User,     // 댓글 작성자 정보도 같이 가져오기 
-                attributes: ['id', 'nickname'],
+                attributes: ['id', 'nickname', 'color'],
             }],
         });
         res.json(comment);
@@ -255,7 +255,7 @@ router.post('/:id/retweet', isLoggedIn, async (req, res, next) => {
             include: [
             {
                 model: db.User,         // 작성자 정보 
-                attributes: ['id', 'nickname'],
+                attributes: ['id', 'nickname', 'color'],
             }, 
             {
                 model: db.Post,         // 리트윗한 게시글 정보 
@@ -263,7 +263,7 @@ router.post('/:id/retweet', isLoggedIn, async (req, res, next) => {
                 include: [
                 {
                     model: db.User,     // 리트윗한 게시글의 작성자 정보 
-                    attributes: ['id', 'nickname'],
+                    attributes: ['id', 'nickname', 'color'],
                 }, 
                 {
                     model: db.Image,    // 리트윗한 게시글의 이미지 정보 
@@ -300,7 +300,7 @@ router.get('/:id', async (req, res, next) => {
         where: { id: req.params.id },
         include: [{
           model: db.User,
-          attributes: ['id', 'nickname'],
+          attributes: ['id', 'nickname', 'color'],
         }, {
           model: db.Image,
         }],

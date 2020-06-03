@@ -26,13 +26,14 @@ const Signup = () => {
     const [passwordError, setPasswordError] = useState(false);
     const [termError, setTermError] = useState(false);
     
-
     const [id, onChangeId] = useInput('');
     const [nick, onChangeNick] = useInput('');
     const [password, onChangePassword] = useInput('');
 
     const dispatch = useDispatch();
     const { isSigningUp, me } = useSelector(state => state.user);
+
+    const randomColor = ['red', 'green', 'blue', 'orange', 'gray', 'pink', 'purple'];
 
     // 회원가입 창에서 로그인 해버리는 경우, 메인페이지로 redirect
     useEffect(() => {
@@ -56,6 +57,7 @@ const Signup = () => {
                 userId: id,
                 password,
                 nickname: nick,
+                color: randomColor.splice(Math.random()*7, 1)[0],
             },
         });
     }, [id, nick, password, passwordCheck, term]);

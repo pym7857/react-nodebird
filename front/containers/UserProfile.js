@@ -8,6 +8,8 @@ import { LOG_OUT_REQUEST } from '../reducers/user';
 const UserProfile = () => {
     const { me } = useSelector(state => state.user);
     const dispatch = useDispatch();
+    const myColor = useSelector(state => state.user.me && state.user.me.color);
+    console.log('myColor=', myColor);
 
     const onLogout = useCallback(() => {    // useCallback으로 감싸는 이유는 자식컴포넌트에 props로 전달하기 때문
         dispatch({
@@ -36,7 +38,11 @@ const UserProfile = () => {
             ]}
         >
             <Card.Meta
-            avatar={<Avatar>{me.nickname[0]}</Avatar>}
+            avatar={
+                <Avatar style={{ backgroundColor: myColor || 'gray' }}>
+                    {me.nickname[0]}
+                </Avatar>
+            }
             title={me.nickname}
             />
             <Button onClick={onLogout}>로그아웃</Button>

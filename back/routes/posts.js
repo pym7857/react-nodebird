@@ -23,7 +23,7 @@ router.get('/', async (req, res, next) => {
             include: [
             {
                 model: db.User,                 // 게시글 작성자를 include 
-                attributes: ['id', 'nickname'], // 비밀번호 가져오면 안되니까 id, nickname만 가져오기
+                attributes: ['id', 'nickname', 'color'], // 비밀번호 가져오면 안됨
                                                 // -> PostCard.js의 post.User.nickname[0].. 등으로 사용될것임
             }, 
             {
@@ -41,7 +41,7 @@ router.get('/', async (req, res, next) => {
                 include: [
                 {
                     model: db.User,             // 리트윗한 게시글의 작성자 정보 
-                    attributes: ['id', 'nickname'],
+                    attributes: ['id', 'nickname', 'color'],
                 }, 
                 {
                     model: db.Image,            // 리트윗한 게시글의 이미지 정보 

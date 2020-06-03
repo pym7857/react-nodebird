@@ -10,8 +10,12 @@ module.exports = (sequelize, DataTypes) => {
         unique: true, // 고유한 값
       },
       password: {
-        type: DataTypes.STRING(100), // 100글자 이하
+        type: DataTypes.STRING(100),
         allowNull: false,
+      },
+      color: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
       },
     }, {
       charset: 'utf8',
