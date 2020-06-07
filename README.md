@@ -1,6 +1,6 @@
 # react-nodebird
 ###
 ```
-front: React, Next
-back: express
+next @8
+antd @3
 ```
