@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Menu, Input, Button, Row, Col } from 'antd';
+import { TwitterOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import Router from 'next/router';
 
 import LoginForm from '../containers/LoginForm';
 import UserProfile from '../containers/UserProfile';
-import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const AppLayout = ({ children }) => {
 
@@ -31,18 +31,42 @@ const AppLayout = ({ children }) => {
 
   return (
     <div>
-      <Menu mode="horizontal">
-        <Menu.Item key="home"><Link href="/"><a>노드버드</a></Link></Menu.Item>
-        <Menu.Item key="profile"><Link href="/profile"><a>프로필</a></Link></Menu.Item>
+      {/* 로고 */}
+      <div style={{ float: 'left', width: '250px'}}>
+        <Link href="/">
+          <a>
+            <TwitterOutlined 
+              style={{ 
+                float: 'left', 
+                fontSize: '45px', 
+                marginLeft: '20px', 
+                marginRight: '0px'
+              }}
+            />
+            <h1 style={{ float: 'left'}}>undefined</h1>
+          </a>
+        </Link>
+      </div>
+      {/* 메뉴 */}
+      <Menu mode="horizontal" style={{ verticalAlign: 'middle', marginTop: '5px' }}>
+        <Menu.Item key="home">
+          <Link href="/">
+            <a>Home</a>
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="profile"><Link href="/profile"><a>Profile</a></Link></Menu.Item>
+        <Menu.Item key=""><Link href="/"><a>Chat</a></Link></Menu.Item>
         <Menu.Item key="mail">
           <Input.Search 
             enterButton 
-            style={{ verticalAlign: 'middle' }}
+            style={{ verticalAlign: 'middle', width: '400px'}}
+            placeholder='#해시태그 검색'
             onSearch={onSearch}
           />
         </Menu.Item>
       </Menu>
-      {!me && <Link href="/signup"><a><Button>회원가입</Button></a></Link>}
+      {/*{!me && <Link href="/signup"><a><Button>회원가입</Button></a></Link>}*/}
+      {/* 화면 N분할 */}
       <Row gutter={10}>   {/* gutter={10} : xs, sm 등으로 N등분한 화면의 간격을 넓혀주는 역할  */}
         <Col xs={24} md={6}>
           {me
@@ -55,7 +79,7 @@ const AppLayout = ({ children }) => {
           칠드런 {children}
         </Col>
         <Col xs={24} md={6}>
-
+          오른쪽
         </Col>
       </Row>
       

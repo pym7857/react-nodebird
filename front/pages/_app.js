@@ -24,7 +24,7 @@ const NodeBird = ({ Component, store, pageProps }) => {
         <Container>
             <Provider store={store}>
                 <Helmet
-                    title="NodeBird"
+                    title="pym7857"
                     htmlAttributes={{ lang: 'ko' }}
                     meta={[{
                         charset: 'UTF-8',
@@ -34,11 +34,11 @@ const NodeBird = ({ Component, store, pageProps }) => {
                     }, {
                         'http-equiv': 'X-UA-Compatible', content: 'IE=edge',
                     }, {
-                        name: 'description', content: 'NodeBird SNS',
+                        name: 'description', content: 'pym7857 SNS',
                     }, {
-                        name: 'og:title', content: 'NodeBird',
+                        name: 'og:title', content: 'pym7857',
                     }, {
-                        name: 'og:description', content: 'NodeBird SNS',
+                        name: 'og:description', content: 'pym7857 SNS',
                     }, {
                         property: 'og:type', content: 'website',
                     }, {
